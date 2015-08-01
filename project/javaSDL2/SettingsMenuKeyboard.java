@@ -1,7 +1,7 @@
 /*
 Simple DirectMedia Layer
-Java source code (C) 2009-2012 Sergii Pylypenko
-  
+Java source code (C) 2009-2014 Sergii Pylypenko
+
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
 arising from the use of this software.
@@ -9,7 +9,7 @@ arising from the use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
-  
+
 1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
    in a product, an acknowledgment in the product documentation would be
@@ -96,6 +96,7 @@ class SettingsMenuKeyboard extends SettingsMenu
 				new ScreenKeyboardTransparencyConfig(),
 				new RemapScreenKbConfig(),
 				new CustomizeScreenKbLayout(),
+				new ScreenKeyboardAdvanced(),
 				new OkButton(),
 			};
 			showMenuOptionsList(p, options);
@@ -193,7 +194,13 @@ class SettingsMenuKeyboard extends SettingsMenu
 				p.getResources().getString(R.string.controls_screenkb_by, "Ultimate Droid", "Sean Stieber"),
 				p.getResources().getString(R.string.controls_screenkb_by, "Simple Theme", "Beholder"),
 				p.getResources().getString(R.string.controls_screenkb_by, "Sun", "Sirea"),
-				p.getResources().getString(R.string.controls_screenkb_by, "Keen", "Gerstrong")
+				p.getResources().getString(R.string.controls_screenkb_by, "Keen", "Gerstrong"),
+				p.getResources().getString(R.string.controls_screenkb_by, "Retro", "Santiago Radeff"),
+				p.getResources().getString(R.string.controls_screenkb_by, "Gba", "from RetroArch"),
+				p.getResources().getString(R.string.controls_screenkb_by, "Psx", "from RetroArch"),
+				p.getResources().getString(R.string.controls_screenkb_by, "Snes", "from RetroArch"),
+				p.getResources().getString(R.string.controls_screenkb_by, "DualShock", "from RetroArch"),
+				p.getResources().getString(R.string.controls_screenkb_by, "N64", "from RetroArch")
 				};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(p);
@@ -383,6 +390,13 @@ class SettingsMenuKeyboard extends SettingsMenu
 			{
 				items = Arrays.copyOf(items, items.length + 1);
 				items[items.length - 1] = p.getResources().getString(R.string.remap_screenkb_joystick) + " 2";
+				defaults = Arrays.copyOf(defaults, defaults.length + 1);
+				defaults[defaults.length - 1] = true;
+			}
+			if( Globals.AppUsesThirdJoystick )
+			{
+				items = Arrays.copyOf(items, items.length + 1);
+				items[items.length - 1] = p.getResources().getString(R.string.remap_screenkb_joystick) + " 3";
 				defaults = Arrays.copyOf(defaults, defaults.length + 1);
 				defaults[defaults.length - 1] = true;
 			}
@@ -633,6 +647,7 @@ class SettingsMenuKeyboard extends SettingsMenu
 				R.drawable.b4,
 				R.drawable.b5,
 				R.drawable.b6,
+				R.drawable.dpad,
 				R.drawable.dpad
 			};
 			int oldX = 0, oldY = 0;
@@ -661,6 +676,7 @@ class SettingsMenuKeyboard extends SettingsMenu
 						R.drawable.sun_b4,
 						R.drawable.sun_b5,
 						R.drawable.sun_b6,
+						R.drawable.sun_dpad,
 						R.drawable.sun_dpad
 					};
 				}
@@ -756,6 +772,8 @@ class SettingsMenuKeyboard extends SettingsMenu
 					buttonText = "Text input";
 				if( i == 8 )
 					buttonText = "Joystick 2";
+				if( i == 9 )
+					buttonText = "Joystick 3";
 				p.setText(p.getResources().getString(R.string.screenkb_custom_layout_help) + "\n" + buttonText);
 			}
 
@@ -837,6 +855,54 @@ class SettingsMenuKeyboard extends SettingsMenu
 					goBack(p);
 				}
 			}
+		}
+	}
+
+	static class ScreenKeyboardAdvanced extends Menu
+	{
+		String title(final MainActivity p)
+		{
+			return p.getResources().getString(R.string.advanced);
+		}
+		//boolean enabled() { return true; };
+		void run (final MainActivity p)
+		{
+			CharSequence[] items = {
+				p.getResources().getString(R.string.screenkb_floating_joystick),
+			};
+
+			boolean defaults[] = { 
+				Globals.FloatingScreenJoystick,
+			};
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(p);
+			builder.setTitle(p.getResources().getString(R.string.advanced));
+			builder.setMultiChoiceItems(items, defaults, new DialogInterface.OnMultiChoiceClickListener() 
+			{
+				public void onClick(DialogInterface dialog, int item, boolean isChecked) 
+				{
+					if( item == 0 )
+						Globals.FloatingScreenJoystick = isChecked;
+				}
+			});
+			builder.setPositiveButton(p.getResources().getString(R.string.ok), new DialogInterface.OnClickListener() 
+			{
+				public void onClick(DialogInterface dialog, int item) 
+				{
+					dialog.dismiss();
+					goBack(p);
+				}
+			});
+			builder.setOnCancelListener(new DialogInterface.OnCancelListener()
+			{
+				public void onCancel(DialogInterface dialog)
+				{
+					goBack(p);
+				}
+			});
+			AlertDialog alert = builder.create();
+			alert.setOwnerActivity(p);
+			alert.show();
 		}
 	}
 }

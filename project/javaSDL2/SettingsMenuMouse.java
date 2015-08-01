@@ -1,7 +1,7 @@
 /*
 Simple DirectMedia Layer
-Java source code (C) 2009-2012 Sergii Pylypenko
-  
+Java source code (C) 2009-2014 Sergii Pylypenko
+
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
 arising from the use of this software.
@@ -9,7 +9,7 @@ arising from the use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
-  
+
 1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
    in a product, an acknowledgment in the product documentation would be
@@ -121,18 +121,14 @@ class SettingsMenuMouse extends SettingsMenu
 		void run (final MainActivity p)
 		{
 			CharSequence[] items = {
-										p.getResources().getString(R.string.display_size_tiny_touchpad),
-										p.getResources().getString(R.string.display_size_tiny),
 										p.getResources().getString(R.string.display_size_small),
 										p.getResources().getString(R.string.display_size_small_touchpad),
 										p.getResources().getString(R.string.display_size_large),
 									};
-			int _size_tiny_touchpad = 0;
-			int _size_tiny = 1;
-			int _size_small = 2;
-			int _size_small_touchpad = 3;
-			int _size_large = 4;
-			int _more_options = 5;
+			int _size_small = 0;
+			int _size_small_touchpad = 1;
+			int _size_large = 2;
+			int _more_options = 3;
 
 			if( ! Globals.SwVideoMode )
 			{
@@ -143,14 +139,11 @@ class SettingsMenuMouse extends SettingsMenu
 				items = items2;
 				_size_small_touchpad = 0;
 				_size_large = 1;
-				_size_tiny_touchpad = _size_tiny = _size_small = 1000;
-
+				_size_small = 1000;
 			}
 			if( firstStart )
 			{
 				CharSequence[] items2 = {
-											p.getResources().getString(R.string.display_size_tiny_touchpad),
-											p.getResources().getString(R.string.display_size_tiny),
 											p.getResources().getString(R.string.display_size_small),
 											p.getResources().getString(R.string.display_size_small_touchpad),
 											p.getResources().getString(R.string.display_size_large),
@@ -169,8 +162,6 @@ class SettingsMenuMouse extends SettingsMenu
 				}
 			}
 			// Java is so damn worse than C++11
-			final int size_tiny_touchpad = _size_tiny_touchpad;
-			final int size_tiny = _size_tiny;
 			final int size_small = _size_small;
 			final int size_small_touchpad = _size_small_touchpad;
 			final int size_large = _size_large;
@@ -200,18 +191,6 @@ class SettingsMenuMouse extends SettingsMenu
 						Globals.LeftClickMethod = Mouse.LEFT_CLICK_WITH_TAP_OR_TIMEOUT;
 						Globals.RelativeMouseMovement = true;
 						Globals.ShowScreenUnderFinger = Mouse.ZOOM_NONE;
-					}
-					if( item == size_tiny )
-					{
-						Globals.LeftClickMethod = Mouse.LEFT_CLICK_NEAR_CURSOR;
-						Globals.RelativeMouseMovement = false;
-						Globals.ShowScreenUnderFinger = Mouse.ZOOM_SCREEN_TRANSFORM;
-					}
-					if( item == size_tiny_touchpad )
-					{
-						Globals.LeftClickMethod = Mouse.LEFT_CLICK_WITH_TAP_OR_TIMEOUT;
-						Globals.RelativeMouseMovement = true;
-						Globals.ShowScreenUnderFinger = Mouse.ZOOM_FULLSCREEN_MAGNIFIER;
 					}
 					if( item == more_options )
 					{
@@ -430,35 +409,50 @@ class SettingsMenuMouse extends SettingsMenu
 	{
 		String title(final MainActivity p)
 		{
-			return p.getResources().getString(R.string.pointandclick_question);
+			return p.getResources().getString(R.string.advanced);
 		}
 		void run (final MainActivity p)
 		{
 			CharSequence[] items = {
-				p.getResources().getString(R.string.pointandclick_joystickmouse),
+				p.getResources().getString(R.string.mouse_hover_jitter_filter),
+				p.getResources().getString(R.string.mouse_joystickmouse),
 				p.getResources().getString(R.string.click_with_dpadcenter),
-				p.getResources().getString(R.string.pointandclick_relative)
+				p.getResources().getString(R.string.mouse_relative),
+				p.getResources().getString(R.string.mouse_gyroscope_mouse),
+				p.getResources().getString(R.string.mouse_finger_hover),
+				p.getResources().getString(R.string.mouse_subframe_touch_events),
 			};
 
-			boolean defaults[] = { 
+			boolean defaults[] = {
+				Globals.HoverJitterFilter,
 				Globals.MoveMouseWithJoystick,
 				Globals.ClickMouseWithDpad,
-				Globals.RelativeMouseMovement
+				Globals.RelativeMouseMovement,
+				Globals.MoveMouseWithGyroscope,
+				Globals.FingerHover,
+				Globals.GenerateSubframeTouchEvents,
 			};
 
-			
 			AlertDialog.Builder builder = new AlertDialog.Builder(p);
-			builder.setTitle(p.getResources().getString(R.string.pointandclick_question));
+			builder.setTitle(p.getResources().getString(R.string.advanced));
 			builder.setMultiChoiceItems(items, defaults, new DialogInterface.OnMultiChoiceClickListener()
 			{
 				public void onClick(DialogInterface dialog, int item, boolean isChecked) 
 				{
 					if( item == 0 )
-						Globals.MoveMouseWithJoystick = isChecked;
+						Globals.HoverJitterFilter = isChecked;
 					if( item == 1 )
-						Globals.ClickMouseWithDpad = isChecked;
+						Globals.MoveMouseWithJoystick = isChecked;
 					if( item == 2 )
+						Globals.ClickMouseWithDpad = isChecked;
+					if( item == 3 )
 						Globals.RelativeMouseMovement = isChecked;
+					if( item == 4 )
+						Globals.MoveMouseWithGyroscope = isChecked;
+					if( item == 5 )
+						Globals.FingerHover = isChecked;
+					if( item == 6 )
+						Globals.GenerateSubframeTouchEvents = isChecked;
 				}
 			});
 			builder.setPositiveButton(p.getResources().getString(R.string.ok), new DialogInterface.OnClickListener()
@@ -466,10 +460,45 @@ class SettingsMenuMouse extends SettingsMenu
 				public void onClick(DialogInterface dialog, int item) 
 				{
 					dialog.dismiss();
-					if( Globals.RelativeMouseMovement )
-						showRelativeMouseMovementConfig(p);
-					else
-						goBack(p);
+					showGyroscopeMouseMovementConfig(p);
+				}
+			});
+			builder.setOnCancelListener(new DialogInterface.OnCancelListener()
+			{
+				public void onCancel(DialogInterface dialog)
+				{
+					goBack(p);
+				}
+			});
+			AlertDialog alert = builder.create();
+			alert.setOwnerActivity(p);
+			alert.show();
+		}
+
+		static void showGyroscopeMouseMovementConfig(final MainActivity p)
+		{
+			if( !Globals.MoveMouseWithGyroscope )
+			{
+				showRelativeMouseMovementConfig(p);
+				return;
+			}
+
+			final CharSequence[] items = {	p.getResources().getString(R.string.accel_veryslow),
+											p.getResources().getString(R.string.accel_slow),
+											p.getResources().getString(R.string.accel_medium),
+											p.getResources().getString(R.string.accel_fast),
+											p.getResources().getString(R.string.accel_veryfast) };
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(p);
+			builder.setTitle(R.string.mouse_gyroscope_mouse_sensitivity);
+			builder.setSingleChoiceItems(items, Globals.MoveMouseWithGyroscopeSpeed, new DialogInterface.OnClickListener()
+			{
+				public void onClick(DialogInterface dialog, int item)
+				{
+					Globals.MoveMouseWithGyroscopeSpeed = item;
+
+					dialog.dismiss();
+					showRelativeMouseMovementConfig(p);
 				}
 			});
 			builder.setOnCancelListener(new DialogInterface.OnCancelListener()
@@ -486,6 +515,12 @@ class SettingsMenuMouse extends SettingsMenu
 
 		static void showRelativeMouseMovementConfig(final MainActivity p)
 		{
+			if( !Globals.RelativeMouseMovement )
+			{
+				goBack(p);
+				return;
+			}
+
 			final CharSequence[] items = {	p.getResources().getString(R.string.accel_veryslow),
 											p.getResources().getString(R.string.accel_slow),
 											p.getResources().getString(R.string.accel_medium),
@@ -493,10 +528,10 @@ class SettingsMenuMouse extends SettingsMenu
 											p.getResources().getString(R.string.accel_veryfast) };
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(p);
-			builder.setTitle(R.string.pointandclick_relative_speed);
+			builder.setTitle(R.string.mouse_relative_speed);
 			builder.setSingleChoiceItems(items, Globals.RelativeMouseMovementSpeed, new DialogInterface.OnClickListener()
 			{
-				public void onClick(DialogInterface dialog, int item) 
+				public void onClick(DialogInterface dialog, int item)
 				{
 					Globals.RelativeMouseMovementSpeed = item;
 
@@ -524,7 +559,7 @@ class SettingsMenuMouse extends SettingsMenu
 											p.getResources().getString(R.string.accel_fast) };
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(p);
-			builder.setTitle(R.string.pointandclick_relative_accel);
+			builder.setTitle(R.string.mouse_relative_accel);
 			builder.setSingleChoiceItems(items, Globals.RelativeMouseMovementAccel, new DialogInterface.OnClickListener()
 			{
 				public void onClick(DialogInterface dialog, int item) 
@@ -552,7 +587,7 @@ class SettingsMenuMouse extends SettingsMenu
 	{
 		String title(final MainActivity p)
 		{
-			return p.getResources().getString(R.string.pointandclick_joystickmousespeed);
+			return p.getResources().getString(R.string.mouse_joystickmousespeed);
 		}
 		boolean enabled()
 		{
@@ -565,7 +600,7 @@ class SettingsMenuMouse extends SettingsMenu
 											p.getResources().getString(R.string.accel_fast) };
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(p);
-			builder.setTitle(R.string.pointandclick_joystickmousespeed);
+			builder.setTitle(R.string.mouse_joystickmousespeed);
 			builder.setSingleChoiceItems(items, Globals.MoveMouseWithJoystickSpeed, new DialogInterface.OnClickListener() 
 			{
 				public void onClick(DialogInterface dialog, int item) 
@@ -596,7 +631,7 @@ class SettingsMenuMouse extends SettingsMenu
 											p.getResources().getString(R.string.accel_fast) };
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(p);
-			builder.setTitle(R.string.pointandclick_joystickmouseaccel);
+			builder.setTitle(R.string.mouse_joystickmouseaccel);
 			builder.setSingleChoiceItems(items, Globals.MoveMouseWithJoystickAccel, new DialogInterface.OnClickListener() 
 			{
 				public void onClick(DialogInterface dialog, int item) 

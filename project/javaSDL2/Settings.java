@@ -1,7 +1,7 @@
 /*
 Simple DirectMedia Layer
-Java source code (C) 2009-2012 Sergii Pylypenko
-  
+Java source code (C) 2009-2014 Sergii Pylypenko
+
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
 arising from the use of this software.
@@ -9,7 +9,7 @@ arising from the use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
-  
+
 1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
    in a product, an acknowledgment in the product documentation would be
@@ -72,6 +72,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorEvent;
 import android.hardware.Sensor;
 import android.widget.Toast;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.content.Intent;
 
 
 // TODO: too much code here, split into multiple files, possibly auto-generated menus?
@@ -90,13 +93,13 @@ class Settings
 			out.writeInt(SETTINGS_FILE_VERSION);
 			out.writeBoolean(Globals.DownloadToSdcard);
 			out.writeBoolean(Globals.PhoneHasArrowKeys);
-			out.writeBoolean(Globals.PhoneHasTrackball);
+			out.writeBoolean(false);
 			out.writeBoolean(Globals.UseAccelerometerAsArrowKeys);
 			out.writeBoolean(Globals.UseTouchscreenKeyboard);
 			out.writeInt(Globals.TouchscreenKeyboardSize);
 			out.writeInt(Globals.AccelerometerSensitivity);
 			out.writeInt(Globals.AccelerometerCenterPos);
-			out.writeInt(Globals.TrackballDampening);
+			out.writeInt(0);
 			out.writeInt(Globals.AudioBufferConfig);
 			out.writeInt(Globals.TouchscreenKeyboardTheme);
 			out.writeInt(Globals.RightClickMethod);
@@ -157,20 +160,30 @@ class Settings
 			out.writeInt(Globals.OptionalDataDownload.length);
 			for(int i = 0; i < Globals.OptionalDataDownload.length; i++)
 				out.writeBoolean(Globals.OptionalDataDownload[i]);
-			out.writeBoolean(Globals.BrokenLibCMessageShown);
+			out.writeBoolean(false); // Unused
 			out.writeInt(Globals.TouchscreenKeyboardDrawSize);
 			out.writeInt(p.getApplicationVersion());
-			out.writeFloat(Globals.gyro_x1);
-			out.writeFloat(Globals.gyro_x2);
-			out.writeFloat(Globals.gyro_xc);
-			out.writeFloat(Globals.gyro_y1);
-			out.writeFloat(Globals.gyro_y2);
-			out.writeFloat(Globals.gyro_yc);
-			out.writeFloat(Globals.gyro_z1);
-			out.writeFloat(Globals.gyro_z2);
-			out.writeFloat(Globals.gyro_zc);
+			out.writeFloat(AccelerometerReader.gyro.x1);
+			out.writeFloat(AccelerometerReader.gyro.x2);
+			out.writeFloat(AccelerometerReader.gyro.xc);
+			out.writeFloat(AccelerometerReader.gyro.y1);
+			out.writeFloat(AccelerometerReader.gyro.y2);
+			out.writeFloat(AccelerometerReader.gyro.yc);
+			out.writeFloat(AccelerometerReader.gyro.z1);
+			out.writeFloat(AccelerometerReader.gyro.z2);
+			out.writeFloat(AccelerometerReader.gyro.zc);
 
 			out.writeBoolean(Globals.OuyaEmulation);
+			out.writeBoolean(Globals.HoverJitterFilter);
+			out.writeBoolean(Globals.MoveMouseWithGyroscope);
+			out.writeInt(Globals.MoveMouseWithGyroscopeSpeed);
+			out.writeBoolean(Globals.FingerHover);
+			out.writeBoolean(Globals.FloatingScreenJoystick);
+			out.writeBoolean(Globals.GenerateSubframeTouchEvents);
+			out.writeInt(Globals.VideoDepthBpp);
+			out.writeBoolean(Globals.HorizontalOrientation);
+			out.writeBoolean(Globals.ImmersiveMode);
+			out.writeBoolean(Globals.AutoDetectOrientation);
 
 			out.close();
 			settingsLoaded = true;
@@ -187,7 +200,7 @@ class Settings
 			return;
 		}
 		Log.i("SDL", "libSDL: Settings.Load(): enter");
-		/*nativeInitKeymap(); // TODO: Disabled in SDL2
+		nativeInitKeymap();
 		if( p.isRunningOnOUYA() )
 			nativeSetKeymapKey(KeyEvent.KEYCODE_MENU, nativeGetKeymapKey(KeyEvent.KEYCODE_BACK)); // Ouya does not have Back key, only Menu, so remap Back keycode to Menu
 		for( int i = 0; i < SDL_Keys.JAVA_KEYCODE_LAST; i++ )
@@ -207,14 +220,16 @@ class Settings
 				if(SDL_Keys.values[ii] == sdlKey)
 					idx = ii;
 			Globals.RemapScreenKbKeycode[i] = idx;
-		}*/
+		}
 		Globals.ScreenKbControlsShown[0] = (Globals.AppNeedsArrowKeys || Globals.AppUsesJoystick);
 		Globals.ScreenKbControlsShown[1] = Globals.AppNeedsTextInput;
 		for( int i = 2; i < Globals.ScreenKbControlsShown.length; i++ )
 			Globals.ScreenKbControlsShown[i] = ( i - 2 < Globals.AppTouchscreenKeyboardKeysAmount );
 		if( Globals.AppUsesSecondJoystick )
 			Globals.ScreenKbControlsShown[8] = true;
-		/*for( int i = 0; i < Globals.RemapMultitouchGestureKeycode.length; i++ )
+		if( Globals.AppUsesThirdJoystick )
+			Globals.ScreenKbControlsShown[9] = true;
+		for( int i = 0; i < Globals.RemapMultitouchGestureKeycode.length; i++ )
 		{
 			int sdlKey = nativeGetKeymapKeyMultitouchGesture(i);
 			int idx = 0;
@@ -222,7 +237,7 @@ class Settings
 				if(SDL_Keys.values[ii] == sdlKey)
 					idx = ii;
 			Globals.RemapMultitouchGestureKeycode[i] = idx;
-		}*/
+		}
 		for( int i = 0; i < Globals.MultitouchGesturesUsed.length; i++ )
 			Globals.MultitouchGesturesUsed[i] = true;
 		// Adjust coordinates of on-screen buttons from 800x480
@@ -261,13 +276,13 @@ class Settings
 				throw new IOException();
 			Globals.DownloadToSdcard = settingsFile.readBoolean();
 			Globals.PhoneHasArrowKeys = settingsFile.readBoolean();
-			Globals.PhoneHasTrackball = settingsFile.readBoolean();
+			settingsFile.readBoolean();
 			Globals.UseAccelerometerAsArrowKeys = settingsFile.readBoolean();
 			Globals.UseTouchscreenKeyboard = settingsFile.readBoolean();
 			Globals.TouchscreenKeyboardSize = settingsFile.readInt();
 			Globals.AccelerometerSensitivity = settingsFile.readInt();
 			Globals.AccelerometerCenterPos = settingsFile.readInt();
-			Globals.TrackballDampening = settingsFile.readInt();
+			settingsFile.readInt();
 			Globals.AudioBufferConfig = settingsFile.readInt();
 			Globals.TouchscreenKeyboardTheme = settingsFile.readInt();
 			Globals.RightClickMethod = settingsFile.readInt();
@@ -338,20 +353,30 @@ class Settings
 			Globals.OptionalDataDownload = new boolean[settingsFile.readInt()];
 			for(int i = 0; i < Globals.OptionalDataDownload.length; i++)
 				Globals.OptionalDataDownload[i] = settingsFile.readBoolean();
-			Globals.BrokenLibCMessageShown = settingsFile.readBoolean();
+			settingsFile.readBoolean(); // Unused
 			Globals.TouchscreenKeyboardDrawSize = settingsFile.readInt();
 			int cfgVersion = settingsFile.readInt();
-			Globals.gyro_x1 = settingsFile.readFloat();
-			Globals.gyro_x2 = settingsFile.readFloat();
-			Globals.gyro_xc = settingsFile.readFloat();
-			Globals.gyro_y1 = settingsFile.readFloat();
-			Globals.gyro_y2 = settingsFile.readFloat();
-			Globals.gyro_yc = settingsFile.readFloat();
-			Globals.gyro_z1 = settingsFile.readFloat();
-			Globals.gyro_z2 = settingsFile.readFloat();
-			Globals.gyro_zc = settingsFile.readFloat();
+			AccelerometerReader.gyro.x1 = settingsFile.readFloat();
+			AccelerometerReader.gyro.x2 = settingsFile.readFloat();
+			AccelerometerReader.gyro.xc = settingsFile.readFloat();
+			AccelerometerReader.gyro.y1 = settingsFile.readFloat();
+			AccelerometerReader.gyro.y2 = settingsFile.readFloat();
+			AccelerometerReader.gyro.yc = settingsFile.readFloat();
+			AccelerometerReader.gyro.z1 = settingsFile.readFloat();
+			AccelerometerReader.gyro.z2 = settingsFile.readFloat();
+			AccelerometerReader.gyro.zc = settingsFile.readFloat();
 
 			Globals.OuyaEmulation = settingsFile.readBoolean();
+			Globals.HoverJitterFilter = settingsFile.readBoolean();
+			Globals.MoveMouseWithGyroscope = settingsFile.readBoolean();
+			Globals.MoveMouseWithGyroscopeSpeed = settingsFile.readInt();
+			Globals.FingerHover = settingsFile.readBoolean();
+			Globals.FloatingScreenJoystick = settingsFile.readBoolean();
+			Globals.GenerateSubframeTouchEvents = settingsFile.readBoolean();
+			Globals.VideoDepthBpp = settingsFile.readInt();
+			Globals.HorizontalOrientation = settingsFile.readBoolean();
+			Globals.ImmersiveMode = settingsFile.readBoolean();
+			Globals.AutoDetectOrientation = settingsFile.readBoolean();
 
 			settingsLoaded = true;
 
@@ -391,8 +416,13 @@ class Settings
 				Log.i("SDL", "libSDL: SD card or external storage is not mounted (state " + Environment.getExternalStorageState() + "), switching to the internal storage.");
 				Globals.DownloadToSdcard = false;
 			}
+			if( p.getPackageManager().checkPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, p.getPackageName()) != PackageManager.PERMISSION_GRANTED )
+			{
+				Log.i("SDL", "libSDL: We don't have permission to write to SD card, switching to the internal storage.");
+				Globals.DownloadToSdcard = false;
+			}
 			Globals.DataDir = Globals.DownloadToSdcard ?
-								SdcardAppPath.getPath(p) :
+								SdcardAppPath.getBestPath(p) :
 								p.getFilesDir().getAbsolutePath();
 			if( Globals.DownloadToSdcard )
 			{
@@ -402,10 +432,17 @@ class Settings
 					for( String s: fileList )
 						if( s.toUpperCase().startsWith(DataDownloader.DOWNLOAD_FLAG_FILENAME.toUpperCase()) )
 							Globals.DataDir = SdcardAppPath.deprecatedPath(p);
+				// Also check for pre-Kitkat files location
+				fileList = new File(SdcardAppPath.getPath(p)).list();
+				if( fileList != null )
+					for( String s: fileList )
+						if( s.toUpperCase().startsWith(DataDownloader.DOWNLOAD_FLAG_FILENAME.toUpperCase()) )
+							Globals.DataDir = SdcardAppPath.getPath(p);
 			}
 		}
 
 		Log.i("SDL", "libSDL: Settings.Load(): loading settings failed, running config dialog");
+		p.setScreenOrientation();
 		p.setUpStatusLabel();
 		if( checkRamSize(p) )
 			SettingsMenu.showConfig(p, true);
@@ -462,31 +499,16 @@ class Settings
 		} catch( FileNotFoundException e ) {
 		} catch ( IOException e ) { }
 		new File( p.getFilesDir() + "/" + SettingsFileName ).delete();
-		PendingIntent intent = PendingIntent.getActivity(p, 0, new Intent(p.getIntent()), p.getIntent().getFlags());
-		AlarmManager mgr = (AlarmManager) p.getSystemService(Context.ALARM_SERVICE);
-		mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, intent);
+
+		Intent intent = new Intent(p, RestartMainActivity.class);
+		p.startActivity(intent);
 		System.exit(0);
 	}
 
 	// ===============================================================================================
 
-	static void Apply(MainActivity p)
+	static void applyMouseEmulationOptions()
 	{
-		/*nativeSetVideoDepth(Globals.VideoDepthBpp, Globals.NeedGles2 ? 1 : 0);
-		if(Globals.VideoLinearFilter)
-			nativeSetVideoLinearFilter();
-		if( Globals.CompatibilityHacksVideo )
-		{
-			Globals.MultiThreadedVideo = true;
-			Globals.SwVideoMode = true;
-			nativeSetCompatibilityHacks();
-		}
-		if( Globals.SwVideoMode )
-			nativeSetVideoForceSoftwareMode();
-		if( Globals.SwVideoMode && Globals.MultiThreadedVideo )
-			nativeSetVideoMultithreaded();
-		if( Globals.PhoneHasTrackball )
-			nativeSetTrackballUsed();
 		if( Globals.AppUsesMouse )
 			nativeSetMouseUsed( Globals.RightClickMethod,
 								Globals.ShowScreenUnderFinger,
@@ -504,14 +526,38 @@ class Settings
 								Globals.RelativeMouseMovement ? 1 : 0,
 								Globals.RelativeMouseMovementSpeed,
 								Globals.RelativeMouseMovementAccel,
-								Globals.ShowMouseCursor ? 1 : 0 );
-		nativeSetJoystickUsed(Globals.AppUsesJoystick ? 1 : 0, Globals.AppUsesSecondJoystick ? 1 : 0);
+								Globals.ShowMouseCursor ? 1 : 0,
+								Globals.HoverJitterFilter ? 1 : 0,
+								Globals.RightMouseButtonLongPress ? 1 : 0,
+								Globals.MoveMouseWithGyroscope ? 1 : 0,
+								Globals.MoveMouseWithGyroscopeSpeed,
+								Globals.CompatibilityHacksForceScreenUpdateMouseClick ? 1 : 0,
+								Globals.ScreenFollowsMouse ? 1 : 0 );
+	}
+
+	static void Apply(MainActivity p)
+	{
+		setEnvVars(p);
+		nativeSetVideoDepth(Globals.VideoDepthBpp, Globals.NeedGles2 ? 1 : 0);
+		if(Globals.VideoLinearFilter)
+			nativeSetVideoLinearFilter();
+		if( Globals.CompatibilityHacksVideo )
+		{
+			Globals.MultiThreadedVideo = true;
+			Globals.SwVideoMode = true;
+			nativeSetCompatibilityHacks();
+		}
+		if( Globals.SwVideoMode )
+			nativeSetVideoForceSoftwareMode();
+		if( Globals.SwVideoMode && Globals.MultiThreadedVideo )
+			nativeSetVideoMultithreaded();
+		applyMouseEmulationOptions();
+		nativeSetJoystickUsed( Globals.AppUsesThirdJoystick ? 3 : (Globals.AppUsesSecondJoystick ? 2 : (Globals.AppUsesJoystick ? 1 : 0)) );
 		if( Globals.AppUsesAccelerometer )
 			nativeSetAccelerometerUsed();
 		if( Globals.AppUsesMultitouch )
 			nativeSetMultitouchUsed();
 		nativeSetAccelerometerSettings(Globals.AccelerometerSensitivity, Globals.AccelerometerCenterPos);
-		nativeSetTrackballDampening(Globals.TrackballDampening);
 		if( Globals.UseTouchscreenKeyboard )
 		{
 			boolean screenKbReallyUsed = false;
@@ -526,8 +572,8 @@ class Settings
 				nativeSetupScreenKeyboard(	Globals.TouchscreenKeyboardSize,
 											Globals.TouchscreenKeyboardDrawSize,
 											Globals.TouchscreenKeyboardTheme,
-											Globals.AppTouchscreenKeyboardKeysAmountAutoFire,
-											Globals.TouchscreenKeyboardTransparency );
+											Globals.TouchscreenKeyboardTransparency,
+											Globals.FloatingScreenJoystick ? 1 : 0 );
 				SetupTouchscreenKeyboardGraphics(p);
 				for( int i = 0; i < Globals.RemapScreenKbKeycode.length; i++ )
 					nativeSetKeymapKeyScreenKb(i, SDL_Keys.values[Globals.RemapScreenKbKeycode[i]]);
@@ -552,8 +598,11 @@ class Settings
 		nativeSetMultitouchGestureSensitivity(Globals.MultitouchGestureSensitivity);
 		if( Globals.TouchscreenCalibration[2] > Globals.TouchscreenCalibration[0] )
 			nativeSetTouchscreenCalibration(Globals.TouchscreenCalibration[0], Globals.TouchscreenCalibration[1],
-				Globals.TouchscreenCalibration[2], Globals.TouchscreenCalibration[3]);*/
+				Globals.TouchscreenCalibration[2], Globals.TouchscreenCalibration[3]);
+	}
 
+	static void setEnvVars(MainActivity p)
+	{
 		String lang = new String(Locale.getDefault().getLanguage());
 		if( Locale.getDefault().getCountry().length() > 0 )
 			lang = lang + "_" + Locale.getDefault().getCountry();
@@ -565,11 +614,22 @@ class Settings
 		nativeSetEnv( "SECURE_STORAGE_DIR", p.getFilesDir().getAbsolutePath() );
 		nativeSetEnv( "DATADIR", Globals.DataDir );
 		nativeSetEnv( "UNSECURE_STORAGE_DIR", Globals.DataDir );
+		SdcardAppPath.setEnv(p);
 		nativeSetEnv( "HOME", Globals.DataDir );
+		nativeSetEnv( "SDCARD", Environment.getExternalStorageDirectory().getAbsolutePath() );
 		nativeSetEnv( "ANDROID_VERSION", String.valueOf(android.os.Build.VERSION.SDK_INT) );
+		nativeSetEnv( "ANDROID_PACKAGE_NAME", p.getPackageName() );
+		nativeSetEnv( "ANDROID_MY_OWN_APP_FILE", p.getPackageResourcePath() );
+		try {
+			nativeSetEnv( "ANDROID_APP_NAME", p.getString(p.getApplicationInfo().labelRes) );
+		} catch (Exception eeeeee) {}
+		if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO )
+			nativeSetEnv( "ANDROID_PACKAGE_PATH", p.getPackageCodePath() );
 		Log.d("SDL", "libSDL: Is running on OUYA: " + p.isRunningOnOUYA());
 		if( p.isRunningOnOUYA() )
 			nativeSetEnv( "OUYA", "1" );
+		if (p.getIntent().getStringExtra(RestartMainActivity.SDL_RESTART_PARAMS) != null)
+			nativeSetEnv( RestartMainActivity.SDL_RESTART_PARAMS, p.getIntent().getStringExtra(RestartMainActivity.SDL_RESTART_PARAMS) );
 		try {
 			DisplayMetrics dm = new DisplayMetrics();
 			p.getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -592,7 +652,7 @@ class Settings
 	static byte [] loadRaw(Activity p, int res)
 	{
 		byte [] buf = new byte[65536 * 2];
-		byte [] a = new byte[65536 * 4 * 10]; // We need 2363516 bytes for the Sun theme
+		byte [] a = new byte[1048576 * 5]; // We need 5Mb buffer for Keen theme, and this Java code is inefficient
 		int written = 0;
 		try{
 			InputStream is = new GZIPInputStream(p.getResources().openRawResource(res));
@@ -620,25 +680,29 @@ class Settings
 		{
 			if(Globals.TouchscreenKeyboardTheme < 0)
 				Globals.TouchscreenKeyboardTheme = 0;
-			if(Globals.TouchscreenKeyboardTheme > 3)
-				Globals.TouchscreenKeyboardTheme = 3;
+			if(Globals.TouchscreenKeyboardTheme > 9)
+				Globals.TouchscreenKeyboardTheme = 9;
 
 			if( Globals.TouchscreenKeyboardTheme == 0 )
-			{
 				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.ultimatedroid));
-			}
 			if( Globals.TouchscreenKeyboardTheme == 1 )
-			{
 				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.simpletheme));
-			}
 			if( Globals.TouchscreenKeyboardTheme == 2 )
-			{
 				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.sun));
-			}
 			if( Globals.TouchscreenKeyboardTheme == 3 )
-			{
 				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.keen));
-			}
+			if( Globals.TouchscreenKeyboardTheme == 4 )
+				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.retro));
+			if( Globals.TouchscreenKeyboardTheme == 5 )
+				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.gba));
+			if( Globals.TouchscreenKeyboardTheme == 6 )
+				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.psx));
+			if( Globals.TouchscreenKeyboardTheme == 7 )
+				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.snes));
+			if( Globals.TouchscreenKeyboardTheme == 8 )
+				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.dualshock));
+			if( Globals.TouchscreenKeyboardTheme == 9 )
+				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.n64));
 		}
 	}
 
@@ -646,12 +710,26 @@ class Settings
 	{
 		private static SdcardAppPath get()
 		{
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO)
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT)
+				return Kitkat.Holder.sInstance;
+			else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO)
 				return Froyo.Holder.sInstance;
 			else
 				return Dummy.Holder.sInstance;
 		}
 		public abstract String path(final Context p);
+		private void setEnvInternal(final Context p)
+		{
+			nativeSetEnv( "UNSECURE_STORAGE_DIR_0", Globals.DataDir );
+		}
+		public static void setEnv(final Context p)
+		{
+			get().setEnvInternal(p);
+		}
+		public String bestPath(final Context p)
+		{
+			return path(p);
+		};
 		public static String deprecatedPath(final Context p)
 		{
 			return Environment.getExternalStorageDirectory().getAbsolutePath() + "/app-data/" + p.getPackageName();
@@ -660,6 +738,13 @@ class Settings
 		{
 			try {
 				return get().path(p);
+			} catch(Exception e) { }
+			return Dummy.Holder.sInstance.path(p);
+		}
+		public static String getBestPath(final Context p)
+		{
+			try {
+				return get().bestPath(p);
 			} catch(Exception e) { }
 			return Dummy.Holder.sInstance.path(p);
 		}
@@ -673,6 +758,46 @@ class Settings
 			public String path(final Context p)
 			{
 				return p.getExternalFilesDir(null).getAbsolutePath();
+			}
+		}
+		private static class Kitkat extends Froyo
+		{
+			private static class Holder
+			{
+				private static final Kitkat sInstance = new Kitkat();
+			}
+			public String bestPath(final Context p)
+			{
+				File[] paths = p.getExternalFilesDirs(null);
+				String ret = path(p);
+				long maxSize = -1;
+				for( File path: paths )
+				{
+					if( path == null )
+						continue;
+					StatFs stat = new StatFs(path.getPath());
+					long size = (long)stat.getAvailableBlocks() * stat.getBlockSize() / 1024 / 1024;
+					if( size > maxSize )
+					{
+						maxSize = size;
+						ret = path.getAbsolutePath();
+					}
+				}
+				return ret;
+			};
+			public void setEnvInternal(final Context p)
+			{
+				File[] paths = p.getExternalFilesDirs(null);
+				int index = 0;
+				for( File path: paths )
+				{
+					if( path == null )
+						continue;
+					if( !path.exists() )
+						path.mkdirs();
+					nativeSetEnv( "UNSECURE_STORAGE_DIR_" + index, path.getAbsolutePath() );
+					index++;
+				}
 			}
 		}
 		private static class Dummy extends SdcardAppPath
@@ -743,8 +868,6 @@ class Settings
 		return true;
 	}
 	
-	private static native void nativeSetTrackballUsed();
-	private static native void nativeSetTrackballDampening(int value);
 	private static native void nativeSetAccelerometerSettings(int sensitivity, int centerPos);
 	private static native void nativeSetMouseUsed(int RightClickMethod, int ShowScreenUnderFinger, int LeftClickMethod, 
 													int MoveMouseWithJoystick, int ClickMouseWithDpad, int MaxForce, int MaxRadius,
@@ -752,8 +875,11 @@ class Settings
 													int leftClickKeycode, int rightClickKeycode,
 													int leftClickTimeout, int rightClickTimeout,
 													int relativeMovement, int relativeMovementSpeed,
-													int relativeMovementAccel, int showMouseCursor);
-	private static native void nativeSetJoystickUsed(int firstJoystickUsed, int secondJoystickUsed);
+													int relativeMovementAccel, int showMouseCursor,
+													int HoverJitterFilter, int RightMouseButtonLongPress,
+													int MoveMouseWithGyroscope, int MoveMouseWithGyroscopeSpeed,
+													int ForceScreenUpdateMouseClick, int ScreenFollowsMouse);
+	private static native void nativeSetJoystickUsed(int amount);
 	private static native void nativeSetAccelerometerUsed();
 	private static native void nativeSetMultitouchUsed();
 	private static native void nativeSetTouchscreenKeyboardUsed();
@@ -762,7 +888,7 @@ class Settings
 	private static native void nativeSetCompatibilityHacks();
 	private static native void nativeSetVideoMultithreaded();
 	private static native void nativeSetVideoForceSoftwareMode();
-	private static native void nativeSetupScreenKeyboard(int size, int drawsize, int theme, int nbuttonsAutoFire, int transparency);
+	private static native void nativeSetupScreenKeyboard(int size, int drawsize, int theme, int transparency, int floatingScreenJoystick);
 	private static native void nativeSetupScreenKeyboardButtons(byte[] img);
 	private static native void nativeInitKeymap();
 	private static native int  nativeGetKeymapKey(int key);
@@ -779,4 +905,3 @@ class Settings
 	public static native int   nativeChmod(final String name, int mode);
 	public static native void  nativeChdir(final String dir);
 }
-

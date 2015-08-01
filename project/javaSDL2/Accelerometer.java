@@ -1,7 +1,7 @@
 /*
 Simple DirectMedia Layer
-Java source code (C) 2009-2012 Sergii Pylypenko
-  
+Java source code (C) 2009-2014 Sergii Pylypenko
+
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
 arising from the use of this software.
@@ -9,7 +9,7 @@ arising from the use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
-  
+
 1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
    in a product, an acknowledgment in the product documentation would be
@@ -35,6 +35,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Log;
 import android.widget.TextView;
+import android.os.Build;
 
 
 class AccelerometerReader implements SensorEventListener
@@ -43,6 +44,7 @@ class AccelerometerReader implements SensorEventListener
 	private SensorManager _manager = null;
 	public boolean openedBySDL = false;
 	public static final GyroscopeListener gyro = new GyroscopeListener();
+	public static final OrientationListener orientation = new OrientationListener();
 
 	public AccelerometerReader(Activity context)
 	{
@@ -53,9 +55,10 @@ class AccelerometerReader implements SensorEventListener
 	{
 		if( _manager != null )
 		{
-			Log.i("SDL", "libSDL: stopping accelerometer/gyroscope");
+			Log.i("SDL", "libSDL: stopping accelerometer/gyroscope/orientation");
 			_manager.unregisterListener(this);
 			_manager.unregisterListener(gyro);
+			_manager.unregisterListener(orientation);
 		}
 	}
 
@@ -67,10 +70,19 @@ class AccelerometerReader implements SensorEventListener
 			Log.i("SDL", "libSDL: starting accelerometer");
 			_manager.registerListener(this, _manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
 		}
-		if( Globals.AppUsesGyroscope && _manager != null && _manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null )
+		if( (Globals.AppUsesGyroscope || Globals.MoveMouseWithGyroscope) &&
+			_manager != null && _manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null )
 		{
 			Log.i("SDL", "libSDL: starting gyroscope");
 			_manager.registerListener(gyro, _manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
+		}
+		if( (Globals.AppUsesOrientationSensor) && _manager != null &&
+			_manager.getDefaultSensor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ? Sensor.TYPE_GAME_ROTATION_VECTOR : Sensor.TYPE_ROTATION_VECTOR) != null )
+		{
+			Log.i("SDL", "libSDL: starting orientation sensor");
+			_manager.registerListener(orientation, _manager.getDefaultSensor(
+				Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ? Sensor.TYPE_GAME_ROTATION_VECTOR : Sensor.TYPE_ROTATION_VECTOR),
+				SensorManager.SENSOR_DELAY_GAME);
 		}
 	}
 
@@ -81,24 +93,39 @@ class AccelerometerReader implements SensorEventListener
 		else
 			nativeAccelerometer(event.values[0], event.values[1], event.values[2]); // TODO: not tested!
 	}
+
 	public void onAccuracyChanged(Sensor s, int a)
 	{
 	}
 
 	static class GyroscopeListener implements SensorEventListener
 	{
-		public float x1, x2, xc, y1, y2, yc, z1, z2, zc;
+		public float x1 = 0.0f, x2 = 0.0f, xc = 0.0f, y1 = 0.0f, y2 = 0.0f, yc = 0.0f, z1 = 0.0f, z2 = 0.0f, zc = 0.0f;
+		public boolean invertedOrientation = false;
 		public GyroscopeListener()
 		{
 		}
 		public void onSensorChanged(SensorEvent event)
 		{
-			// TODO: vertical orientation
-			//if( Globals.HorizontalOrientation )
 			if( event.values[0] < x1 || event.values[0] > x2 ||
 				event.values[1] < y1 || event.values[1] > y2 ||
 				event.values[2] < z1 || event.values[2] > z2 )
-				nativeGyroscope(event.values[0] - xc, event.values[1] - yc, event.values[2] - zc);
+			{
+				if( Globals.HorizontalOrientation )
+				{
+					if( invertedOrientation )
+						nativeGyroscope(-(event.values[0] - xc), -(event.values[1] - yc), event.values[2] - zc);
+					else
+						nativeGyroscope(event.values[0] - xc, event.values[1] - yc, event.values[2] - zc);
+				}
+				else
+				{
+					if( invertedOrientation )
+						nativeGyroscope(-(event.values[1] - yc), event.values[0] - xc, event.values[2] - zc);
+					else
+						nativeGyroscope(event.values[1] - yc, -(event.values[0] - xc), event.values[2] - zc);
+				}
+			}
 		}
 		public void onAccuracyChanged(Sensor s, int a)
 		{
@@ -113,7 +140,10 @@ class AccelerometerReader implements SensorEventListener
 			SensorManager manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 			if ( manager == null && manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) == null )
 				return;
-			manager.registerListener(l, manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
+			manager.registerListener(gyro, manager.getDefaultSensor(
+				Globals.AppUsesOrientationSensor ? Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ?
+				Sensor.TYPE_GAME_ROTATION_VECTOR : Sensor.TYPE_ROTATION_VECTOR : Sensor.TYPE_GYROSCOPE),
+				SensorManager.SENSOR_DELAY_GAME);
 		}
 		public void unregisterListener(Activity context,SensorEventListener l)
 		{
@@ -124,6 +154,21 @@ class AccelerometerReader implements SensorEventListener
 		}
 	}
 
+	static class OrientationListener implements SensorEventListener
+	{
+		public OrientationListener()
+		{
+		}
+		public void onSensorChanged(SensorEvent event)
+		{
+			nativeOrientation(event.values[0], event.values[1], event.values[2]);
+		}
+		public void onAccuracyChanged(Sensor s, int a)
+		{
+		}
+	}
+
 	private static native void nativeAccelerometer(float accX, float accY, float accZ);
 	private static native void nativeGyroscope(float X, float Y, float Z);
+	private static native void nativeOrientation(float X, float Y, float Z);
 }

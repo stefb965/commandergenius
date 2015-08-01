@@ -1,7 +1,7 @@
 /*
 Simple DirectMedia Layer
-Java source code (C) 2009-2012 Sergii Pylypenko
-  
+Java source code (C) 2009-2014 Sergii Pylypenko
+
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
 arising from the use of this software.
@@ -9,7 +9,7 @@ arising from the use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
-  
+
 1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
    in a product, an acknowledgment in the product documentation would be
@@ -344,25 +344,41 @@ class SettingsMenuMisc extends SettingsMenu
 		{
 			debugMenuShowCount++;
 			CharSequence[] items = {
-				p.getResources().getString(R.string.pointandclick_keepaspectratio),
-				p.getResources().getString(R.string.video_smooth)
+				p.getResources().getString(R.string.mouse_keepaspectratio),
+				p.getResources().getString(R.string.video_smooth),
+				p.getResources().getString(R.string.video_immersive),
+				p.getResources().getString(R.string.video_orientation_autodetect),
+				p.getResources().getString(R.string.video_orientation_vertical),
+				p.getResources().getString(R.string.video_bpp_24),
 			};
-			boolean defaults[] = { 
+			boolean defaults[] = {
 				Globals.KeepAspectRatio,
-				Globals.VideoLinearFilter
+				Globals.VideoLinearFilter,
+				Globals.ImmersiveMode,
+				Globals.AutoDetectOrientation,
+				!Globals.HorizontalOrientation,
+				Globals.VideoDepthBpp == 24,
 			};
 
 			if(Globals.SwVideoMode && !Globals.CompatibilityHacksVideo)
 			{
 				CharSequence[] items2 = {
-					p.getResources().getString(R.string.pointandclick_keepaspectratio),
+					p.getResources().getString(R.string.mouse_keepaspectratio),
 					p.getResources().getString(R.string.video_smooth),
+					p.getResources().getString(R.string.video_immersive),
+					p.getResources().getString(R.string.video_orientation_autodetect),
+					p.getResources().getString(R.string.video_orientation_vertical),
+					p.getResources().getString(R.string.video_bpp_24),
 					p.getResources().getString(R.string.video_separatethread),
 				};
 				boolean defaults2[] = { 
 					Globals.KeepAspectRatio,
 					Globals.VideoLinearFilter,
-					Globals.MultiThreadedVideo
+					Globals.ImmersiveMode,
+					Globals.AutoDetectOrientation,
+					!Globals.HorizontalOrientation,
+					Globals.VideoDepthBpp == 24,
+					Globals.MultiThreadedVideo,
 				};
 				items = items2;
 				defaults = defaults2;
@@ -371,7 +387,7 @@ class SettingsMenuMisc extends SettingsMenu
 			if(Globals.Using_SDL_1_3)
 			{
 				CharSequence[] items2 = {
-					p.getResources().getString(R.string.pointandclick_keepaspectratio),
+					p.getResources().getString(R.string.mouse_keepaspectratio),
 				};
 				boolean defaults2[] = { 
 					Globals.KeepAspectRatio,
@@ -391,6 +407,14 @@ class SettingsMenuMisc extends SettingsMenu
 					if( item == 1 )
 						Globals.VideoLinearFilter = isChecked;
 					if( item == 2 )
+						Globals.ImmersiveMode = isChecked;
+					if( item == 3 )
+						Globals.AutoDetectOrientation = isChecked;
+					if( item == 4 )
+						Globals.HorizontalOrientation = !isChecked;
+					if( item == 5 )
+						Globals.VideoDepthBpp = (isChecked ? 24 : 16);
+					if( item == 6 )
 						Globals.MultiThreadedVideo = isChecked;
 				}
 			});
@@ -566,13 +590,13 @@ class SettingsMenuMisc extends SettingsMenu
 		}
 		boolean enabled()
 		{
-			return Globals.AppUsesGyroscope;
+			return Globals.AppUsesGyroscope || Globals.MoveMouseWithGyroscope;
 		}
 		void run (final MainActivity p)
 		{
-			if( !Globals.AppUsesGyroscope || !AccelerometerReader.gyro.available(p) )
+			if( !(Globals.AppUsesGyroscope || Globals.MoveMouseWithGyroscope) || !AccelerometerReader.gyro.available(p) )
 			{
-				if( Globals.AppUsesGyroscope )
+				if( Globals.AppUsesGyroscope || Globals.MoveMouseWithGyroscope )
 				{
 					Toast toast = Toast.makeText(p, p.getResources().getString(R.string.calibrate_gyroscope_not_supported), Toast.LENGTH_LONG);
 					toast.show();
@@ -623,7 +647,7 @@ class SettingsMenuMisc extends SettingsMenu
 			m.setRectToRect(src, dst, Matrix.ScaleToFit.FILL);
 			img.setImageMatrix(m);
 			p.getVideoLayout().addView(img);
-			numEvents = 0;
+			numEvents = -10;
 			AccelerometerReader.gyro.x1 = 100;
 			AccelerometerReader.gyro.x2 = -100;
 			AccelerometerReader.gyro.xc = 0;
@@ -640,9 +664,9 @@ class SettingsMenuMisc extends SettingsMenu
 				{
 					for(int count = 1; count < 10; count++)
 					{
-						p.setText("" + count + "0% ...");
+						p.setText("" + count * 10 + "% ...");
 						try {
-							Thread.sleep(500);
+							Thread.sleep(300);
 						} catch( Exception e ) {}
 					}
 					finishCalibration(p);
@@ -661,15 +685,17 @@ class SettingsMenuMisc extends SettingsMenu
 		void gyroscopeEvent(float x, float y, float z)
 		{
 			numEvents++;
+			if (numEvents <= 0)
+				return; // Skip few initial measurements, they may be incorrect
 			AccelerometerReader.gyro.xc += x;
 			AccelerometerReader.gyro.yc += y;
 			AccelerometerReader.gyro.zc += z;
-			AccelerometerReader.gyro.x1 = Math.min(AccelerometerReader.gyro.x1, x * 1.1f); // Small safety bound coefficient
-			AccelerometerReader.gyro.x2 = Math.max(AccelerometerReader.gyro.x2, x * 1.1f);
-			AccelerometerReader.gyro.y1 = Math.min(AccelerometerReader.gyro.y1, y * 1.1f);
-			AccelerometerReader.gyro.y2 = Math.max(AccelerometerReader.gyro.y2, y * 1.1f);
-			AccelerometerReader.gyro.z1 = Math.min(AccelerometerReader.gyro.z1, z * 1.1f);
-			AccelerometerReader.gyro.z2 = Math.max(AccelerometerReader.gyro.z2, z * 1.1f);
+			AccelerometerReader.gyro.x1 = Math.min(AccelerometerReader.gyro.x1, x * 1.02f); // Small safety bound coefficient
+			AccelerometerReader.gyro.x2 = Math.max(AccelerometerReader.gyro.x2, x * 1.02f);
+			AccelerometerReader.gyro.y1 = Math.min(AccelerometerReader.gyro.y1, y * 1.02f);
+			AccelerometerReader.gyro.y2 = Math.max(AccelerometerReader.gyro.y2, y * 1.02f);
+			AccelerometerReader.gyro.z1 = Math.min(AccelerometerReader.gyro.z1, z * 1.02f);
+			AccelerometerReader.gyro.z2 = Math.max(AccelerometerReader.gyro.z2, z * 1.02f);
 			final Matrix m = new Matrix();
 			RectF src = new RectF(0, 0, bmp.getWidth(), bmp.getHeight());
 			RectF dst = new RectF(	x * 5000 + p.getVideoLayout().getWidth()/2 - 50, y * 5000 + p.getVideoLayout().getHeight()/2 - 50,
@@ -689,11 +715,15 @@ class SettingsMenuMisc extends SettingsMenu
 			try {
 				Thread.sleep(200); // Just in case we have pending events
 			} catch( Exception e ) {}
-			if( numEvents > 5 )
+			if( numEvents > 10 )
 			{
 				AccelerometerReader.gyro.xc /= (float)numEvents;
 				AccelerometerReader.gyro.yc /= (float)numEvents;
 				AccelerometerReader.gyro.zc /= (float)numEvents;
+				Log.i("SDL", "libSDL: gyroscope calibration: " +
+						AccelerometerReader.gyro.x1 + " < " + AccelerometerReader.gyro.xc + " > " + AccelerometerReader.gyro.x2 +  " : " +
+						AccelerometerReader.gyro.y1 + " < " + AccelerometerReader.gyro.yc + " > " + AccelerometerReader.gyro.y2 +  " : " +
+						AccelerometerReader.gyro.z1 + " < " + AccelerometerReader.gyro.zc + " > " + AccelerometerReader.gyro.z2);
 			}
 			p.runOnUiThread(new Runnable()
 			{
@@ -752,4 +782,3 @@ class SettingsMenuMisc extends SettingsMenu
 		}
 	}
 }
-
