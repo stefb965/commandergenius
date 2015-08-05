@@ -200,7 +200,7 @@ class Settings
 			return;
 		}
 		Log.i("SDL", "libSDL: Settings.Load(): enter");
-		nativeInitKeymap();
+		/*nativeInitKeymap();
 		if( p.isRunningOnOUYA() )
 			nativeSetKeymapKey(KeyEvent.KEYCODE_MENU, nativeGetKeymapKey(KeyEvent.KEYCODE_BACK)); // Ouya does not have Back key, only Menu, so remap Back keycode to Menu
 		for( int i = 0; i < SDL_Keys.JAVA_KEYCODE_LAST; i++ )
@@ -211,8 +211,8 @@ class Settings
 				if(SDL_Keys.values[ii] == sdlKey)
 					idx = ii;
 			Globals.RemapHwKeycode[i] = idx;
-		}
-		for( int i = 0; i < Globals.RemapScreenKbKeycode.length; i++ )
+		}*/
+/*		for( int i = 0; i < Globals.RemapScreenKbKeycode.length; i++ )
 		{
 			int sdlKey = nativeGetKeymapKeyScreenKb(i);
 			int idx = 0;
@@ -220,7 +220,7 @@ class Settings
 				if(SDL_Keys.values[ii] == sdlKey)
 					idx = ii;
 			Globals.RemapScreenKbKeycode[i] = idx;
-		}
+		}*/
 		Globals.ScreenKbControlsShown[0] = (Globals.AppNeedsArrowKeys || Globals.AppUsesJoystick);
 		Globals.ScreenKbControlsShown[1] = Globals.AppNeedsTextInput;
 		for( int i = 2; i < Globals.ScreenKbControlsShown.length; i++ )
@@ -229,7 +229,7 @@ class Settings
 			Globals.ScreenKbControlsShown[8] = true;
 		if( Globals.AppUsesThirdJoystick )
 			Globals.ScreenKbControlsShown[9] = true;
-		for( int i = 0; i < Globals.RemapMultitouchGestureKeycode.length; i++ )
+		/*for( int i = 0; i < Globals.RemapMultitouchGestureKeycode.length; i++ )
 		{
 			int sdlKey = nativeGetKeymapKeyMultitouchGesture(i);
 			int idx = 0;
@@ -237,7 +237,7 @@ class Settings
 				if(SDL_Keys.values[ii] == sdlKey)
 					idx = ii;
 			Globals.RemapMultitouchGestureKeycode[i] = idx;
-		}
+		}*/
 		for( int i = 0; i < Globals.MultitouchGesturesUsed.length; i++ )
 			Globals.MultitouchGesturesUsed[i] = true;
 		// Adjust coordinates of on-screen buttons from 800x480
@@ -538,7 +538,7 @@ class Settings
 	static void Apply(MainActivity p)
 	{
 		setEnvVars(p);
-		nativeSetVideoDepth(Globals.VideoDepthBpp, Globals.NeedGles2 ? 1 : 0);
+		/*nativeSetVideoDepth(Globals.VideoDepthBpp, Globals.NeedGles2 ? 1 : 0);
 		if(Globals.VideoLinearFilter)
 			nativeSetVideoLinearFilter();
 		if( Globals.CompatibilityHacksVideo )
@@ -598,7 +598,7 @@ class Settings
 		nativeSetMultitouchGestureSensitivity(Globals.MultitouchGestureSensitivity);
 		if( Globals.TouchscreenCalibration[2] > Globals.TouchscreenCalibration[0] )
 			nativeSetTouchscreenCalibration(Globals.TouchscreenCalibration[0], Globals.TouchscreenCalibration[1],
-				Globals.TouchscreenCalibration[2], Globals.TouchscreenCalibration[3]);
+				Globals.TouchscreenCalibration[2], Globals.TouchscreenCalibration[3]);*/
 	}
 
 	static void setEnvVars(MainActivity p)

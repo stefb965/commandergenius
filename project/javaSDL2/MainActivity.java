@@ -21,6 +21,7 @@ freely, subject to the following restrictions:
 
 package net.sourceforge.clonekeenplus;
 
+import org.libsdl.app.SDLActivity; 
 import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
@@ -99,7 +100,7 @@ public class MainActivity extends SDLActivity
 
     // Load the .so
     static {
-        //System.loadLibrary("sdl_native_helpers");
+        System.loadLibrary("sdl_native_helpers");
         System.loadLibrary("sdl2_image");
         System.loadLibrary("application");
         System.loadLibrary("sdl_main");
@@ -255,7 +256,7 @@ public class MainActivity extends SDLActivity
 	
 	public void setUpStatusLabel()
 	{
-		MainActivity Parent = this; // Too lazy to rename
+		/*MainActivity Parent = this; // Too lazy to rename
 		if( Parent._btn != null )
 		{
 			Parent._layout2.removeView(Parent._btn);
@@ -274,7 +275,7 @@ public class MainActivity extends SDLActivity
 			// Padding is a good idea because if the display device is a TV the edges might be cut off
 			Parent._tv.setPadding((int)(width * 0.1), (int)(height * 0.1), (int)(width * 0.1), 0);
 			Parent._layout2.addView(Parent._tv);
-		}
+		}*/
 	}
 
 	public void startDownloader()
@@ -380,7 +381,7 @@ public class MainActivity extends SDLActivity
 
 		Rect r = new Rect();
 		_videoLayout.getWindowVisibleDisplayFrame(r);
-		mGLView.nativeScreenVisibleRect(r.left, r.top, r.right, r.bottom);
+//		mGLView.nativeScreenVisibleRect(r.left, r.top, r.right, r.bottom);
 		_videoLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 		{
 			public void onGlobalLayout()
@@ -395,7 +396,7 @@ public class MainActivity extends SDLActivity
 					public void run()
 					{
 						DimSystemStatusBar.get().dim(_videoLayout);
-						mGLView.nativeScreenVisibleRect(r.left + widthDiff, r.top + heightDiff, r.width(), r.height());
+//						mGLView.nativeScreenVisibleRect(r.left + widthDiff, r.top + heightDiff, r.width(), r.height());
 					}
 				}, 300 );
 				_videoLayout.postDelayed( new Runnable()
@@ -403,7 +404,7 @@ public class MainActivity extends SDLActivity
 					public void run()
 					{
 						DimSystemStatusBar.get().dim(_videoLayout);
-						mGLView.nativeScreenVisibleRect(r.left + widthDiff, r.top + heightDiff, r.width(), r.height());
+//						mGLView.nativeScreenVisibleRect(r.left + widthDiff, r.top + heightDiff, r.width(), r.height());
 					}
 				}, 600 );
 			}

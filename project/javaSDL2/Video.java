@@ -606,7 +606,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 		mWidth = w - w % 2;
 		mHeight = h - h % 2;
 		mGl = gl;
-		nativeResize(mWidth, mHeight, Globals.KeepAspectRatio ? 1 : 0);
+		//nativeResize(mWidth, mHeight, Globals.KeepAspectRatio ? 1 : 0);
 	}
 
 	int mLastPendingResize = 0;
@@ -680,7 +680,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 		mGl = gl;
 		SwapBuffers();
 
-		nativeInitJavaCallbacks();
+		//nativeInitJavaCallbacks();
 		
 		// Make main thread priority lower so audio thread won't get underrun
 		// Thread.currentThread().setPriority((Thread.currentThread().getPriority() + Thread.MIN_PRIORITY)/2);
