@@ -201,11 +201,13 @@ public class MainActivity extends SDLActivity
 					Thread.sleep(200);
 				} catch( InterruptedException e ) {};
 
-				if(p.mAudioThread == null)
+				if(!mLibsLoaded)
+				//if(p.mAudioThread == null)
 				{
 					Log.i("SDL", "libSDL: Loading libraries");
 					p.LoadLibraries();
-					p.mAudioThread = new AudioThread(p);
+					mLibsLoaded = true;
+					//p.mAudioThread = new AudioThread(p);
 					Log.i("SDL", "libSDL: Loading settings");
 					final Semaphore loaded = new Semaphore(0);
 					class Callback2 implements Runnable
@@ -256,7 +258,7 @@ public class MainActivity extends SDLActivity
 	
 	public void setUpStatusLabel()
 	{
-		/*MainActivity Parent = this; // Too lazy to rename
+		MainActivity Parent = this; // Too lazy to rename
 		if( Parent._btn != null )
 		{
 			Parent._layout2.removeView(Parent._btn);
@@ -275,7 +277,7 @@ public class MainActivity extends SDLActivity
 			// Padding is a good idea because if the display device is a TV the edges might be cut off
 			Parent._tv.setPadding((int)(width * 0.1), (int)(height * 0.1), (int)(width * 0.1), 0);
 			Parent._layout2.addView(Parent._tv);
-		}*/
+		}
 	}
 
 	public void startDownloader()
@@ -365,12 +367,12 @@ public class MainActivity extends SDLActivity
 		_videoLayout = new FrameLayout(this);
 		SetLayerType.get().setLayerType(_videoLayout);
 		setContentView(_videoLayout);
-		mGLView = new DemoGLSurfaceView(this);
-		SetLayerType.get().setLayerType(mGLView);
-		_videoLayout.addView(mGLView);
-		mGLView.setFocusableInTouchMode(true);
-		mGLView.setFocusable(true);
-		mGLView.requestFocus();
+		//mGLView = new DemoGLSurfaceView(this);
+		//SetLayerType.get().setLayerType(mGLView);
+		//_videoLayout.addView(mGLView);
+		//mGLView.setFocusableInTouchMode(true);
+		//mGLView.setFocusable(true);
+		//mGLView.requestFocus();
 		if( _ad.getView() != null )
 		{
 			_videoLayout.addView(_ad.getView());
@@ -379,9 +381,12 @@ public class MainActivity extends SDLActivity
 		DimSystemStatusBar.get().dim(_videoLayout);
 		//DimSystemStatusBar.get().dim(mGLView);
 
+		// Here it seems that the correct resolution rect for the device is
+		// We need to pass this to SDL 2.0 
+
 		Rect r = new Rect();
 		_videoLayout.getWindowVisibleDisplayFrame(r);
-//		mGLView.nativeScreenVisibleRect(r.left, r.top, r.right, r.bottom);
+//		mGLView.nativeScreenVisibleRect(r.left, r.top, r.right, r.bottom); // TODO: I need to transfer this somehow...
 		_videoLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 		{
 			public void onGlobalLayout()
@@ -409,6 +414,7 @@ public class MainActivity extends SDLActivity
 				}, 600 );
 			}
 		});
+
 	}
 
 	@Override
@@ -421,8 +427,8 @@ public class MainActivity extends SDLActivity
 			}
 		}
 		_isPaused = true;
-		if( mGLView != null )
-			mGLView.onPause();
+		//if( mGLView != null )
+		//	mGLView.onPause();
 		//if( _ad.getView() != null )
 		//	_ad.getView().onPause();
 		super.onPause();
@@ -431,13 +437,13 @@ public class MainActivity extends SDLActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if( mGLView != null )
+		/*if( mGLView != null )
 		{
 			DimSystemStatusBar.get().dim(_videoLayout);
 			//DimSystemStatusBar.get().dim(mGLView);
 			mGLView.onResume();
 		}
-		else
+		else*/
 		if( downloader != null )
 		{
 			synchronized( downloader )
@@ -479,8 +485,8 @@ public class MainActivity extends SDLActivity
 				downloader.setStatusField(null);
 			}
 		}
-		if( mGLView != null )
-			mGLView.exitApp();
+		/*if( mGLView != null )
+			mGLView.exitApp();*/
 		super.onDestroy();
 		try{
 			Thread.sleep(2000); // The event is sent asynchronously, allow app to save it's state, and call exit() itself.
@@ -520,7 +526,7 @@ public class MainActivity extends SDLActivity
 					if (Globals.TextInputKeyboard == 0)
 					{
 						_inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-						_inputManager.showSoftInput(mGLView, InputMethodManager.SHOW_FORCED);
+						//_inputManager.showSoftInput(mGLView, InputMethodManager.SHOW_FORCED);
 						getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 					}
 					else
@@ -612,13 +618,13 @@ public class MainActivity extends SDLActivity
 						_screenKeyboard = null;
 					}
 					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-					_inputManager.hideSoftInputFromWindow(mGLView.getWindowToken(), 0);
+					//_inputManager.hideSoftInputFromWindow(mGLView.getWindowToken(), 0);
 					DimSystemStatusBar.get().dim(_videoLayout);
 					//DimSystemStatusBar.get().dim(mGLView);
 				}
 			});
 		}
-		mGLView.nativeScreenKeyboardShown( keyboardWithoutTextInputShown ? 1 : 0 );
+		//mGLView.nativeScreenKeyboardShown( keyboardWithoutTextInputShown ? 1 : 0 );
 	}
 
 	public void showScreenKeyboard(final String oldText)
@@ -754,9 +760,9 @@ public class MainActivity extends SDLActivity
 		_inputManager.hideSoftInputFromWindow(_screenKeyboard.getWindowToken(), 0);
 		_videoLayout.removeView(_screenKeyboard);
 		_screenKeyboard = null;
-		mGLView.setFocusableInTouchMode(true);
+		/*mGLView.setFocusableInTouchMode(true);
 		mGLView.setFocusable(true);
-		mGLView.requestFocus();
+		mGLView.requestFocus();*/
 		DimSystemStatusBar.get().dim(_videoLayout);
 
 		_videoLayout.postDelayed( new Runnable()
@@ -890,12 +896,12 @@ public class MainActivity extends SDLActivity
 		if( _screenKeyboard != null && _screenKeyboard.onKeyDown(keyCode, event) )
 			return true;
 
-		if( mGLView != null )
+		/*if( mGLView != null )
 		{
 			if( mGLView.nativeKey( keyCode, 1, event.getUnicodeChar() ) == 0 )
 				return super.onKeyDown(keyCode, event);
 		}
-		else
+		else*/
 		if( keyListener != null )
 		{
 			keyListener.onKeyEvent(keyCode);
@@ -918,7 +924,7 @@ public class MainActivity extends SDLActivity
 		if( _screenKeyboard != null && _screenKeyboard.onKeyUp(keyCode, event) )
 			return true;
 
-		if( mGLView != null )
+		/*if( mGLView != null )
 		{
 			if( mGLView.nativeKey( keyCode, 0, event.getUnicodeChar() ) == 0 )
 				return super.onKeyUp(keyCode, event);
@@ -928,7 +934,7 @@ public class MainActivity extends SDLActivity
 				//DimSystemStatusBar.get().dim(mGLView);
 			}
 		}
-		else
+		else*/
 		if( _btn != null )
 			return _btn.onKeyUp(keyCode, event);
 		return true;
@@ -942,7 +948,7 @@ public class MainActivity extends SDLActivity
 			_screenKeyboard.onKeyMultiple(keyCode, repeatCount, event);
 			return true;
 		}
-		else if( mGLView != null && event.getCharacters() != null )
+		/*else if( mGLView != null && event.getCharacters() != null )
 		{
 			// International text input
 			for(int i = 0; i < event.getCharacters().length(); i++ )
@@ -951,7 +957,7 @@ public class MainActivity extends SDLActivity
 				mGLView.nativeKey( event.getKeyCode(), 0, event.getCharacters().codePointAt(i) );
 			}
 			return true;
-		}
+		}*/
 		return false;
 	}
 
@@ -982,9 +988,9 @@ public class MainActivity extends SDLActivity
 			_ad.getView().getBottom() > (int)ev.getY() )
 			return super.dispatchTouchEvent(ev);
 		else
-		if(mGLView != null)
+		/*if(mGLView != null)
 			mGLView.onTouchEvent(ev);
-		else
+		else*/
 		if( _btn != null )
 			return _btn.dispatchTouchEvent(ev);
 		else
@@ -1003,8 +1009,8 @@ public class MainActivity extends SDLActivity
 			_screenKeyboard.dispatchGenericMotionEvent(ev);
 		else
 		*/
-		if(mGLView != null)
-			mGLView.onGenericMotionEvent(ev);
+		/*if(mGLView != null)
+			mGLView.onGenericMotionEvent(ev);*/
 		return true;
 	}
 
@@ -1416,12 +1422,13 @@ public class MainActivity extends SDLActivity
 			setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	}
 
-	public FrameLayout getVideoLayout() { return _videoLayout; }
+	public FrameLayout getVideoLayout() { return _videoLayout; } 
 
 	static int NOTIFY_ID = 12367098; // Random ID
 
-	DemoGLSurfaceView mGLView = null;
-	private static AudioThread mAudioThread = null;
+	//DemoGLSurfaceView mGLView = null; // TODO: Gerstrong, disabled because SDL 2.0 take leadership
+	//private static AudioThread mAudioThread = null; // TODO: Gerstrong, disabled because SDL 2.0 take leadership
+	private boolean mLibsLoaded = false;
 	private static DataDownloader downloader = null;
 
 	private TextView _tv = null;

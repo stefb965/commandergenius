@@ -613,7 +613,8 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 	public void onWindowResize(final int w, final int h)
 	{
 		Log.d("SDL", "libSDL: DemoRenderer.onWindowResize(): " + w + "x" + h);
-		mLastPendingResize ++;
+		Log.d("SDL", "libSDL: DemoRenderer.onWindowResize() NOTE: this is disabled for SDL2");
+		/*mLastPendingResize ++;
 		final int resizeThreadIndex = mLastPendingResize;
 		context.mGLView.postDelayed(new Runnable()
 		{
@@ -665,6 +666,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 					Globals.HorizontalOrientation = (ww > hh);
 			}
 		}, 2000);
+		*/
 	}
 
 	public void onSurfaceDestroyed()
