@@ -156,3 +156,8 @@ JAVA_EXPORT_NAME(DemoRenderer_nativeInit) ( JNIEnv*  env, jobject thiz, jstring 
 	}
 #endif
 };
+
+
+
+
+

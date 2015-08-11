@@ -133,7 +133,7 @@ extern DECLSPEC int SDLCALL IMG_SavePNG(SDL_Surface *surface, const char *file);
 extern DECLSPEC int SDLCALL IMG_SavePNG_RW(SDL_Surface *surface, SDL_RWops *dst, int freedst);
 
 /* We'll use SDL for reporting errors */
-#define IMG_SetError    SDL_SetError
+#define IMG_SetError    //SDL_SetError
 #define IMG_GetError    SDL_GetError
 
 /* Ends C function definitions when using C++ */

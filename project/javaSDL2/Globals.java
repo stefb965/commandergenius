@@ -30,10 +30,10 @@ class Globals
 {
 	// These config options are modified by ChangeAppsettings.sh script - see the detailed descriptions there
 	public static String ApplicationName = "CommanderGenius";
-	public static String AppLibraries[] = { "sdl-1.2", };
+	public static String AppLibraries[] = { "sdl-2.0", };
 	public static String AppMainLibraries[] = { "application", "sdl_main" };
 	public static final boolean Using_SDL_1_3 = false;
-	public static final boolean Using_SDL_2_0 = false;
+	public static final boolean Using_SDL_2_0 = true;
 	public static String[] DataDownloadUrl = { "Data files are 2 Mb|https://sourceforge.net/projects/libsdl-android/files/CommanderGenius/commandergenius-data.zip/download", "High-quality GFX and music - 40 Mb|https://sourceforge.net/projects/libsdl-android/files/CommanderGenius/commandergenius-hqp.zip/download" };
 	public static boolean SwVideoMode = false;
 	public static boolean NeedDepthBuffer = false;
@@ -71,15 +71,15 @@ class Globals
 	public static String[] AppTouchscreenKeyboardKeysNames = "Fire Shoot Switch_weapon Jump Run Hide/Seek".split(" ");
 	public static int StartupMenuButtonTimeout = 3000;
 	public static int AppMinimumRAM = 0;
-	public static SettingsMenu.Menu HiddenMenuOptions [] = {}; // If you see error here - update HiddenMenuOptions in your AndroidAppSettings.cfg: change OptionalDownloadConfig to SettingsMenuMisc.OptionalDownloadConfig etc.
+/*	public static SettingsMenu.Menu HiddenMenuOptions [] = {}; // If you see error here - update HiddenMenuOptions in your AndroidAppSettings.cfg: change OptionalDownloadConfig to SettingsMenuMisc.OptionalDownloadConfig etc.
 	public static SettingsMenu.Menu FirstStartMenuOptions [] = { new SettingsMenuMisc.ShowReadme(), (AppUsesMouse && ! ForceRelativeMouseMode ? new SettingsMenuMouse.DisplaySizeConfig() : new SettingsMenu.DummyMenu()), new SettingsMenuMisc.OptionalDownloadConfig(), new SettingsMenuMisc.GyroscopeCalibration() };
 	public static String AdmobPublisherId = "";
 	public static String AdmobTestDeviceId = "";
 	public static String AdmobBannerSize = "";
-	public static String GooglePlayGameServicesId = "";
+	public static String GooglePlayGameServicesId = "";*/
 
 	// Phone-specific config, modified by user in "Change phone config" startup dialog
-	public static int VideoDepthBpp = 16;
+	/*public static int VideoDepthBpp = 16;
 	public static boolean HorizontalOrientation = true;
 	public static boolean AutoDetectOrientation = false;
 	public static boolean ImmersiveMode = true;
@@ -126,7 +126,7 @@ class Globals
 													AppUsesSecondJoystick ?
 													new int[][] { { 0, 303, 177, 480 }, { 0, 0, 48, 48 }, { 400, 392, 488, 480 }, { 312, 392, 400, 480 }, { 400, 304, 488, 392 }, { 312, 304, 400, 392 }, { 400, 216, 488, 304 }, { 312, 216, 400, 304 }, { 623, 303, 800, 480 } } :
 													new int[][] { { 0, 303, 177, 480 }, { 0, 0, 48, 48 }, { 712, 392, 800, 480 }, { 624, 392, 712, 480 }, { 712, 304, 800, 392 }, { 624, 304, 712, 392 }, { 712, 216, 800, 304 }, { 624, 216, 712, 304 } };
-	public static boolean ScreenKbControlsShown[] = new boolean[ScreenKbControlsLayout.length]; /* Also joystick and text input button added */
+	public static boolean ScreenKbControlsShown[] = new boolean[ScreenKbControlsLayout.length]; // Also joystick and text input button added 
 	public static int RemapMultitouchGestureKeycode[] = new int[4];
 	public static boolean MultitouchGesturesUsed[] = new boolean[4];
 	public static int MultitouchGestureSensitivity = 1;
@@ -136,5 +136,5 @@ class Globals
 	public static boolean MultiThreadedVideo = false;
 
 	public static boolean OuyaEmulation = false; // For debugging
-	public static boolean RedirectStdout = false; // For debugging
+	public static boolean RedirectStdout = false; // For debugging*/
 }

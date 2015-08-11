@@ -22,7 +22,7 @@ freely, subject to the following restrictions:
 package net.sourceforge.clonekeenplus;
 
 import org.libsdl.app.SDLActivity; 
-import android.app.Activity;
+/*import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.os.Bundle;
@@ -89,7 +89,7 @@ import android.view.ViewTreeObserver;
 import android.graphics.Rect;
 import android.view.InputDevice;
 import android.inputmethodservice.KeyboardView;
-import android.inputmethodservice.Keyboard;
+import android.inputmethodservice.Keyboard;*/
 
 /* 
  * A sample wrapper class that just calls SDLActivity 
@@ -98,14 +98,15 @@ import android.inputmethodservice.Keyboard;
 public class MainActivity extends SDLActivity 
 { 
 
-    // Load the .so
+    // Load the .so files
     static {
         System.loadLibrary("sdl_native_helpers");
-        System.loadLibrary("sdl2_image");
-        System.loadLibrary("application");
+        //System.loadLibrary("sdl2_image");
+       // System.loadLibrary("application");
         System.loadLibrary("sdl_main");
+        //System.loadLibrary("main");
     }
-
+/*
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -167,7 +168,8 @@ public class MainActivity extends SDLActivity
 
 		ImageView img = new ImageView(this);
 
-		img.setScaleType(ImageView.ScaleType.FIT_CENTER /* FIT_XY */ );
+		img.setScaleType(ImageView.ScaleType.FIT_CENTER );
+		//img.setScaleType(FIT_XY);
 		try
 		{
 			img.setImageDrawable(Drawable.createFromStream(getAssets().open("logo.png"), "logo.png"));
@@ -248,6 +250,7 @@ public class MainActivity extends SDLActivity
 			}
 		};
 		(new Thread(new Callback(this))).start();
+
 		if( Globals.CreateService )
 		{
 			Intent intent = new Intent(this, DummyService.class);
@@ -256,6 +259,8 @@ public class MainActivity extends SDLActivity
 		cloudSave = new CloudSave(this);
 	}
 	
+*/
+/*
 	public void setUpStatusLabel()
 	{
 		MainActivity Parent = this; // Too lazy to rename
@@ -279,7 +284,8 @@ public class MainActivity extends SDLActivity
 			Parent._layout2.addView(Parent._tv);
 		}
 	}
-
+*/
+/*
 	public void startDownloader()
 	{
 		Log.i("SDL", "libSDL: Starting data downloader");
@@ -298,7 +304,8 @@ public class MainActivity extends SDLActivity
 		cb.Parent = this;
 		this.runOnUiThread(cb);
 	}
-
+*/
+/*
 	public void initSDL()
 	{
 		setScreenOrientation();
@@ -347,7 +354,8 @@ public class MainActivity extends SDLActivity
 			}
 		})).start();
 	}
-
+*/
+/*
 	private void initSDLInternal()
 	{
 		if(sdlInited)
@@ -395,7 +403,7 @@ public class MainActivity extends SDLActivity
 				_videoLayout.getWindowVisibleDisplayFrame(r);
 				final int heightDiff = _videoLayout.getRootView().getHeight() - _videoLayout.getHeight(); // Take system bar into consideration
 				final int widthDiff = _videoLayout.getRootView().getWidth() - _videoLayout.getWidth(); // Nexus 5 has system bar at the right side
-				Log.v("SDL", "Main window visible region changed: " + r.left + ":" + r.top + ":" + r.width() + ":" + r.height() );
+				Log.v("SDL", "libSDL: Main window visible region changed: " + r.left + ":" + r.top + ":" + r.width() + ":" + r.height() );
 				_videoLayout.postDelayed( new Runnable()
 				{
 					public void run()
@@ -416,7 +424,8 @@ public class MainActivity extends SDLActivity
 		});
 
 	}
-
+*/
+/*
 	@Override
 	protected void onPause() {
 		if( downloader != null )
@@ -433,17 +442,18 @@ public class MainActivity extends SDLActivity
 		//	_ad.getView().onPause();
 		super.onPause();
 	}
-
+*/
+/*
 	@Override
 	protected void onResume() {
 		super.onResume();
-		/*if( mGLView != null )
-		{
-			DimSystemStatusBar.get().dim(_videoLayout);
-			//DimSystemStatusBar.get().dim(mGLView);
-			mGLView.onResume();
-		}
-		else*/
+		//if( mGLView != null )
+		//{
+		//	DimSystemStatusBar.get().dim(_videoLayout);
+		//	//DimSystemStatusBar.get().dim(mGLView);
+		//	mGLView.onResume();
+		//}
+		//else
 		if( downloader != null )
 		{
 			synchronized( downloader )
@@ -459,7 +469,8 @@ public class MainActivity extends SDLActivity
 		//	_ad.getView().onResume();
 		_isPaused = false;
 	}
-
+*/
+/*
 	@Override
 	public void onWindowFocusChanged (boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
@@ -469,12 +480,14 @@ public class MainActivity extends SDLActivity
 		else
 			onResume();
 	}
-	
+*/
+/*	
 	public boolean isPaused()
 	{
 		return _isPaused;
 	}
-
+*/
+/*
 	@Override
 	protected void onDestroy()
 	{
@@ -485,36 +498,39 @@ public class MainActivity extends SDLActivity
 				downloader.setStatusField(null);
 			}
 		}
-		/*if( mGLView != null )
-			mGLView.exitApp();*/
+		//if( mGLView != null )
+		//	mGLView.exitApp();
 		super.onDestroy();
 		try{
 			Thread.sleep(2000); // The event is sent asynchronously, allow app to save it's state, and call exit() itself.
 		} catch (InterruptedException e) {}
 		System.exit(0);
 	}
-
+*/
+/*
 	@Override
 	protected void onStart() {
 		super.onStart();
 		cloudSave.onStart();
 	}
-
+*/
+/*
 	@Override
 	protected void onStop() {
 		super.onStart();
 		cloudSave.onStop();
 	}
-
+*/
+/*
 	@Override
 	public void onActivityResult(int request, int response, Intent data) {
 		super.onActivityResult(request, response, data);
 		cloudSave.onActivityResult(request, response, data);
 	}
+*/
+//	private int TextInputKeyboardList[] = { 0, R.xml.qwerty, R.xml.c64, R.xml.amiga };
 
-	private int TextInputKeyboardList[] = { 0, R.xml.qwerty, R.xml.c64, R.xml.amiga };
-
-	public void showScreenKeyboardWithoutTextInputField()
+/*	public void showScreenKeyboardWithoutTextInputField()
 	{
 		if( !keyboardWithoutTextInputShown )
 		{
@@ -588,16 +604,16 @@ public class MainActivity extends SDLActivity
 							public void swipeUp() {}
 							public void onKey(int p1, int[] p2) {}
 						});
-						/*
-						builtinKeyboard.addOnLayoutChangeListener(new View.OnLayoutChangeListener()
-						{
-							public void onLayoutChange (View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
-							{
-								Log.i("SDL", "Built-in keyboard getTop " + top);
-								((KeyboardView)v).setVerticalCorrection(top);
-							}
-						});
-						*/
+						//
+						//builtinKeyboard.addOnLayoutChangeListener(new View.OnLayoutChangeListener()
+						//{
+						//	public void onLayoutChange (View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
+						//	{
+						//		Log.i("SDL", "Built-in keyboard getTop " + top);
+						//		((KeyboardView)v).setVerticalCorrection(top);
+						//	}
+						//});
+
 						_screenKeyboard = builtinKeyboard;
 						FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
 						_videoLayout.addView(_screenKeyboard, layout);
@@ -626,7 +642,8 @@ public class MainActivity extends SDLActivity
 		}
 		//mGLView.nativeScreenKeyboardShown( keyboardWithoutTextInputShown ? 1 : 0 );
 	}
-
+*/
+/*
 	public void showScreenKeyboard(final String oldText)
 	{
 		if(Globals.CompatibilityHacksTextInputEmulatesHwKeyboard)
@@ -658,47 +675,47 @@ public class MainActivity extends SDLActivity
 					_parent.hideScreenKeyboard();
 					return true;
 				}
-				/*
-				if (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_CLEAR)
-				{
-					// EditText deletes two characters at a time, here's a hacky fix
-					if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getFlags() | KeyEvent.FLAG_SOFT_KEYBOARD) != 0)
-					{
-						EditText t = (EditText) v;
-						int start = t.getSelectionStart();  //get cursor starting position
-						int end = t.getSelectionEnd();      //get cursor ending position
-						if ( start < 0 )
-							return true;
-						if ( end < 0 || end == start )
-						{
-							start --;
-							if ( start < 0 )
-								return true;
-							end = start + 1;
-						}
-						t.setText(t.getText().toString().substring(0, start) + t.getText().toString().substring(end));
-						t.setSelection(start);
-						return true;
-					}
-				}
-				*/
+				
+				//if (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_CLEAR)
+				//{
+				//	// EditText deletes two characters at a time, here's a hacky fix
+				//	if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getFlags() | KeyEvent.FLAG_SOFT_KEYBOARD) != 0)
+				//	{
+				//		EditText t = (EditText) v;
+				//		int start = t.getSelectionStart();  //get cursor starting position
+				//		int end = t.getSelectionEnd();      //get cursor ending position
+				//		if ( start < 0 )
+				//			return true;
+				//		if ( end < 0 || end == start )
+				//		{
+				//			start --;
+				//			if ( start < 0 )
+				//				return true;
+				//			end = start + 1;
+				//		}
+				//		t.setText(t.getText().toString().substring(0, start) + t.getText().toString().substring(end));
+				//		t.setSelection(start);
+				//		return true;
+				//	}
+				//}
+				
 				//Log.i("SDL", "Key " + keyCode + " flags " + event.getFlags() + " action " + event.getAction());
 				return false;
 			}
 		};
 		EditText screenKeyboard = new EditText(this);
 		// This code does not work
-		/*
-		screenKeyboard.setMaxLines(100);
-		ViewGroup.LayoutParams layout = _screenKeyboard.getLayoutParams();
-		if( layout != null )
-		{
-			layout.width = ViewGroup.LayoutParams.FILL_PARENT;
-			layout.height = ViewGroup.LayoutParams.FILL_PARENT;
-			screenKeyboard.setLayoutParams(layout);
-		}
-		screenKeyboard.setGravity(android.view.Gravity.BOTTOM | android.view.Gravity.LEFT);
-		*/
+		
+		//screenKeyboard.setMaxLines(100);
+		//ViewGroup.LayoutParams layout = _screenKeyboard.getLayoutParams();
+		//if( layout != null )
+		//{
+		//	layout.width = ViewGroup.LayoutParams.FILL_PARENT;
+		//	layout.height = ViewGroup.LayoutParams.FILL_PARENT;
+		//	screenKeyboard.setLayoutParams(layout);
+		//}
+		//screenKeyboard.setGravity(android.view.Gravity.BOTTOM | android.view.Gravity.LEFT);
+		
 		String hint = _screenKeyboardHintMessage;
 		screenKeyboard.setHint(hint != null ? hint : getString(R.string.text_edit_click_here));
 		screenKeyboard.setText(oldText);
@@ -739,7 +756,8 @@ public class MainActivity extends SDLActivity
 				}
 			}, 500 );
 	};
-
+*/
+/*
 	public void hideScreenKeyboard()
 	{
 		if( keyboardWithoutTextInputShown )
@@ -760,9 +778,9 @@ public class MainActivity extends SDLActivity
 		_inputManager.hideSoftInputFromWindow(_screenKeyboard.getWindowToken(), 0);
 		_videoLayout.removeView(_screenKeyboard);
 		_screenKeyboard = null;
-		/*mGLView.setFocusableInTouchMode(true);
-		mGLView.setFocusable(true);
-		mGLView.requestFocus();*/
+		//mGLView.setFocusableInTouchMode(true);
+		//mGLView.setFocusable(true);
+		//mGLView.requestFocus();
 		DimSystemStatusBar.get().dim(_videoLayout);
 
 		_videoLayout.postDelayed( new Runnable()
@@ -773,12 +791,14 @@ public class MainActivity extends SDLActivity
 			}
 		}, 500 );
 	};
-
+*/
+/*
 	public boolean isScreenKeyboardShown()
 	{
 		return _screenKeyboard != null;
 	};
-	
+*/
+/*	
 	public void setScreenKeyboardHintMessage(String s)
 	{
 		_screenKeyboardHintMessage = s;
@@ -795,7 +815,8 @@ public class MainActivity extends SDLActivity
 			}
 		} );
 	}
-
+*/
+/*
 	final static int ADVERTISEMENT_POSITION_RIGHT = -1;
 	final static int ADVERTISEMENT_POSITION_BOTTOM = -1;
 	final static int ADVERTISEMENT_POSITION_CENTER = -2;
@@ -837,6 +858,8 @@ public class MainActivity extends SDLActivity
 			runOnUiThread(new Callback());
 		}
 	}
+*/
+/*
 	public void setAdvertisementVisible(final int visible)
 	{
 		if( _ad.getView() != null )
@@ -854,7 +877,8 @@ public class MainActivity extends SDLActivity
 			runOnUiThread(new Callback());
 		}
 	}
-
+*/
+/*
 	public void getAdvertisementParams(int params[])
 	{
 		for( int i = 0; i < 5; i++ )
@@ -869,6 +893,8 @@ public class MainActivity extends SDLActivity
 			params[4] = _ad.getView().getMeasuredHeight();
 		}
 	}
+*/
+/*
 	public void requestNewAdvertisement()
 	{
 		if( _ad.getView() != null )
@@ -883,7 +909,8 @@ public class MainActivity extends SDLActivity
 			runOnUiThread(new Callback());
 		}
 	}
-
+*/
+/*
 	@Override
 	public boolean onKeyDown(int keyCode, final KeyEvent event)
 	{
@@ -896,12 +923,12 @@ public class MainActivity extends SDLActivity
 		if( _screenKeyboard != null && _screenKeyboard.onKeyDown(keyCode, event) )
 			return true;
 
-		/*if( mGLView != null )
-		{
-			if( mGLView.nativeKey( keyCode, 1, event.getUnicodeChar() ) == 0 )
-				return super.onKeyDown(keyCode, event);
-		}
-		else*/
+		//if( mGLView != null )
+		//{
+		//	if( mGLView.nativeKey( keyCode, 1, event.getUnicodeChar() ) == 0 )
+		//		return super.onKeyDown(keyCode, event);
+		//}
+		//else
 		if( keyListener != null )
 		{
 			keyListener.onKeyEvent(keyCode);
@@ -911,7 +938,8 @@ public class MainActivity extends SDLActivity
 			return _btn.onKeyDown(keyCode, event);
 		return true;
 	}
-	
+*/
+/*	
 	@Override
 	public boolean onKeyUp(int keyCode, final KeyEvent event)
 	{
@@ -924,22 +952,23 @@ public class MainActivity extends SDLActivity
 		if( _screenKeyboard != null && _screenKeyboard.onKeyUp(keyCode, event) )
 			return true;
 
-		/*if( mGLView != null )
-		{
-			if( mGLView.nativeKey( keyCode, 0, event.getUnicodeChar() ) == 0 )
-				return super.onKeyUp(keyCode, event);
-			if( keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU )
-			{
-				DimSystemStatusBar.get().dim(_videoLayout);
-				//DimSystemStatusBar.get().dim(mGLView);
-			}
-		}
-		else*/
+		//if( mGLView != null )
+		//{
+		//	if( mGLView.nativeKey( keyCode, 0, event.getUnicodeChar() ) == 0 )
+		//		return super.onKeyUp(keyCode, event);
+		//	if( keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU )
+		//	{
+		//		DimSystemStatusBar.get().dim(_videoLayout);
+		//		//DimSystemStatusBar.get().dim(mGLView);
+		//	}
+		//}
+		//else
 		if( _btn != null )
 			return _btn.onKeyUp(keyCode, event);
 		return true;
 	}
-
+*/
+/*
 	@Override
 	public boolean onKeyMultiple(int keyCode, int repeatCount, final KeyEvent event)
 	{
@@ -948,19 +977,20 @@ public class MainActivity extends SDLActivity
 			_screenKeyboard.onKeyMultiple(keyCode, repeatCount, event);
 			return true;
 		}
-		/*else if( mGLView != null && event.getCharacters() != null )
-		{
-			// International text input
-			for(int i = 0; i < event.getCharacters().length(); i++ )
-			{
-				mGLView.nativeKey( event.getKeyCode(), 1, event.getCharacters().codePointAt(i) );
-				mGLView.nativeKey( event.getKeyCode(), 0, event.getCharacters().codePointAt(i) );
-			}
-			return true;
-		}*/
+		//else if( mGLView != null && event.getCharacters() != null )
+		//{
+		//	// International text input
+		//	for(int i = 0; i < event.getCharacters().length(); i++ )
+		//	{
+		//		mGLView.nativeKey( event.getKeyCode(), 1, event.getCharacters().codePointAt(i) );
+		//		mGLView.nativeKey( event.getKeyCode(), 0, event.getCharacters().codePointAt(i) );
+		//	}
+		//	return true;
+		//}
 		return false;
 	}
-
+*/
+/*
 	@Override
 	public boolean onKeyLongPress (int keyCode, KeyEvent event)
 	{
@@ -971,7 +1001,8 @@ public class MainActivity extends SDLActivity
 		}
 		return false;
 	}
-
+*/
+/*
 	@Override
 	public boolean dispatchTouchEvent(final MotionEvent ev)
 	{
@@ -988,9 +1019,9 @@ public class MainActivity extends SDLActivity
 			_ad.getView().getBottom() > (int)ev.getY() )
 			return super.dispatchTouchEvent(ev);
 		else
-		/*if(mGLView != null)
-			mGLView.onTouchEvent(ev);
-		else*/
+		//if(mGLView != null)
+		//	mGLView.onTouchEvent(ev);
+		//else
 		if( _btn != null )
 			return _btn.dispatchTouchEvent(ev);
 		else
@@ -998,42 +1029,44 @@ public class MainActivity extends SDLActivity
 			touchListener.onTouchEvent(ev);
 		return true;
 	}
-	
+*/
+/*
 	@Override
 	public boolean dispatchGenericMotionEvent (MotionEvent ev)
 	{
 		//Log.i("SDL", "dispatchGenericMotionEvent: " + ev.getAction() + " coords " + ev.getX() + ":" + ev.getY() );
 		// This code fails to run for Android 1.6, so there will be no generic motion event for Andorid screen keyboard
-		/*
-		if(_screenKeyboard != null)
-			_screenKeyboard.dispatchGenericMotionEvent(ev);
-		else
-		*/
-		/*if(mGLView != null)
-			mGLView.onGenericMotionEvent(ev);*/
+		//
+		//if(_screenKeyboard != null)
+		//	_screenKeyboard.dispatchGenericMotionEvent(ev);
+		//else
+		//
+		if(mGLView != null)
+		//	mGLView.onGenericMotionEvent(ev);
 		return true;
 	}
-
+*/
+/*
 	//private Configuration oldConfig = null;
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
 		super.onConfigurationChanged(newConfig);
 		updateScreenOrientation();
-		/*
-		if (oldConfig != null)
-		{
-			int diff = newConfig.diff(oldConfig);
-			Log.i("SDL", "onConfigurationChanged(): " + " diff " + diff +
-					((diff & ActivityInfo.CONFIG_ORIENTATION) == ActivityInfo.CONFIG_ORIENTATION ? " orientation" : "") +
-					((diff & ActivityInfo.CONFIG_SCREEN_SIZE) == ActivityInfo.CONFIG_SCREEN_SIZE ? " screen size" : "") +
-					((diff & ActivityInfo.CONFIG_SMALLEST_SCREEN_SIZE) == ActivityInfo.CONFIG_SMALLEST_SCREEN_SIZE ? " smallest screen size" : "") +
-					" " + newConfig.toString());
-		}
-		oldConfig = new Configuration(newConfig);
-		*/
+		
+		//if (oldConfig != null)
+		//{
+		//	int diff = newConfig.diff(oldConfig);
+		//	Log.i("SDL", "onConfigurationChanged(): " + " diff " + diff +
+		//			((diff & ActivityInfo.CONFIG_ORIENTATION) == ActivityInfo.CONFIG_ORIENTATION ? " orientation" : "") +
+		//			((diff & ActivityInfo.CONFIG_SCREEN_SIZE) == ActivityInfo.CONFIG_SCREEN_SIZE ? " screen size" : "") +
+		//			((diff & ActivityInfo.CONFIG_SMALLEST_SCREEN_SIZE) == ActivityInfo.CONFIG_SMALLEST_SCREEN_SIZE ? " smallest screen size" : "") +
+		//			" " + newConfig.toString());
+		//}
+		//oldConfig = new Configuration(newConfig);
 	}
-
+*/
+/*
 	public void updateScreenOrientation()
 	{
 		int rotation = Surface.ROTATION_0;
@@ -1042,7 +1075,8 @@ public class MainActivity extends SDLActivity
 		AccelerometerReader.gyro.invertedOrientation = ( rotation == Surface.ROTATION_180 || rotation == Surface.ROTATION_270 );
 		//Log.d("SDL", "updateScreenOrientation(): screen orientation: " + rotation + " inverted " + AccelerometerReader.gyro.invertedOrientation);
 	}
-
+*/
+/*
 	public void setText(final String t)
 	{
 		class Callback implements Runnable
@@ -1061,12 +1095,14 @@ public class MainActivity extends SDLActivity
 		cb.Parent = this;
 		this.runOnUiThread(cb);
 	}
-
+*/
+/*
 	public void showTaskbarNotification()
 	{
 		showTaskbarNotification("SDL application paused", "SDL application", "Application is paused, click to activate");
 	}
-
+*/
+/*
 	// Stolen from SDL port by Mamaich
 	public void showTaskbarNotification(String text0, String text1, String text2)
 	{
@@ -1077,13 +1113,15 @@ public class MainActivity extends SDLActivity
 		n.setLatestEventInfo(this, text1, text2, pendingIntent);
 		NotificationManager.notify(NOTIFY_ID, n);
 	}
-
+*/
+/*
 	public void hideTaskbarNotification()
 	{
 		NotificationManager NotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationManager.cancel(NOTIFY_ID);
 	}
-
+*/
+/*
 	@Override
 	public void onNewIntent(Intent i)
 	{
@@ -1091,7 +1129,8 @@ public class MainActivity extends SDLActivity
 		super.onNewIntent(i);
 		setIntent(i);
 	}
-	
+*/
+/*	
 	public void LoadLibraries()
 	{
 		try
@@ -1169,10 +1208,10 @@ public class MainActivity extends SDLActivity
 				{
 					ZipEntry entry = null;
 					entry = zip.getNextEntry();
-					/*
-					if( entry != null )
-						Log.i("SDL", "Extracting lib " + entry.getName());
-					*/
+					
+					//if( entry != null )
+					//	Log.i("SDL", "Extracting lib " + entry.getName());
+					
 					if( entry == null )
 					{
 						Log.i("SDL", "Extracting libs finished");
@@ -1269,10 +1308,10 @@ public class MainActivity extends SDLActivity
 				{
 					ZipEntry entry = null;
 					entry = zip.getNextEntry();
-					/*
-					if( entry != null )
-						Log.i("SDL", "Extracting lib " + entry.getName());
-					*/
+					
+					//if( entry != null )
+					//	Log.i("SDL", "Extracting lib " + entry.getName());
+					
 					if( entry == null )
 					{
 						Log.i("SDL", "Extracting binaries finished");
@@ -1333,7 +1372,9 @@ public class MainActivity extends SDLActivity
 			}
 		}
 	};
+*/
 
+/*
 	public static void LoadApplicationLibrary(final Context context)
 	{
 		Settings.nativeChdir(Globals.DataDir);
@@ -1366,7 +1407,8 @@ public class MainActivity extends SDLActivity
 		Log.v("SDL", "libSDL: loaded all libraries");
 		ApplicationLibraryLoaded = true;
 	}
-
+*/
+/*
 	public int getApplicationVersion()
 	{
 		try {
@@ -1377,7 +1419,8 @@ public class MainActivity extends SDLActivity
 		}
 		return 0;
 	}
-
+*/
+/*
 	public boolean isRunningOnOUYA()
 	{
 		try {
@@ -1387,7 +1430,8 @@ public class MainActivity extends SDLActivity
 		}
 		return Globals.OuyaEmulation;
 	}
-
+*/
+/*
 	public boolean isCurrentOrientationHorizontal()
 	{
 		if (Globals.AutoDetectOrientation)
@@ -1403,7 +1447,8 @@ public class MainActivity extends SDLActivity
 		Display getOrient = getWindowManager().getDefaultDisplay();
 		return getOrient.getWidth() >= getOrient.getHeight();
 	}
-
+*/
+/*
 	void setScreenOrientation()
 	{
 		if( !Globals.AutoDetectOrientation && getIntent().getBooleanExtra(RestartMainActivity.ACTIVITY_AUTODETECT_SCREEN_ORIENTATION, false) )
@@ -1421,14 +1466,16 @@ public class MainActivity extends SDLActivity
 		else
 			setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	}
-
+*/
+/*
 	public FrameLayout getVideoLayout() { return _videoLayout; } 
+*/
 
-	static int NOTIFY_ID = 12367098; // Random ID
+//	static int NOTIFY_ID = 12367098; // Random ID
 
 	//DemoGLSurfaceView mGLView = null; // TODO: Gerstrong, disabled because SDL 2.0 take leadership
 	//private static AudioThread mAudioThread = null; // TODO: Gerstrong, disabled because SDL 2.0 take leadership
-	private boolean mLibsLoaded = false;
+/*	private boolean mLibsLoaded = false;
 	private static DataDownloader downloader = null;
 
 	private TextView _tv = null;
@@ -1445,28 +1492,31 @@ public class MainActivity extends SDLActivity
 	static boolean keyboardWithoutTextInputShown = false;
 	private boolean sdlInited = false;
 	public static boolean ApplicationLibraryLoaded = false;
-
+*/
+/*
 	public interface TouchEventsListener
 	{
 		public void onTouchEvent(final MotionEvent ev);
 	}
-
+*/
+/*
 	public interface KeyEventsListener
 	{
 		public void onKeyEvent(final int keyCode);
 	}
 
+/*
 	public TouchEventsListener touchListener = null;
 	public KeyEventsListener keyListener = null;
 	boolean _isPaused = false;
 	private InputMethodManager _inputManager = null;
 
 	public LinkedList<Integer> textInput = new LinkedList<Integer> ();
-	public static MainActivity instance = null;
+	public static MainActivity instance = null;*/
 }
 
 // *** HONEYCOMB / ICS FIX FOR FULLSCREEN MODE, by lmak ***
-abstract class DimSystemStatusBar
+/*abstract class DimSystemStatusBar
 {
 	public static DimSystemStatusBar get()
 	{
@@ -1503,7 +1553,8 @@ abstract class DimSystemStatusBar
 		}
 	}
 }
-
+*/
+/*
 abstract class SetLayerType
 {
 	public static SetLayerType get()
@@ -1538,7 +1589,8 @@ abstract class SetLayerType
 		}
 	}
 }
-
+*/
+/*
 class DummyService extends Service
 {
 	public DummyService()
@@ -1560,3 +1612,4 @@ class DummyService extends Service
 		return null;
 	}
 }
+*/
