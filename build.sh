@@ -50,6 +50,10 @@ if [ "$#" -gt 0 -a "$1" = "-h" ]; then
 	exit 0
 fi
 
+# In some cases if you switch between SDL 1.2 and 2.0 the java source must be passed.
+# For that purpose we erase the java sources, so the correct version is taken and set.
+rm -rf project/src
+
 [ -e project/local.properties ] || {
 	android update project -p project || exit 1
 	rm -f project/src/Globals.java
@@ -88,6 +92,8 @@ if uname -s | grep -i "windows" > /dev/null ; then
 	MYARCH=windows-x86
 fi
 grep "64.bit" "`which ndk-build | sed 's@/ndk-build@@'`/RELEASE.TXT" >/dev/null 2>&1 && MYARCH="${MYARCH}_64"
+
+
 
 $quick_rebuild || rm -r -f project/bin/* # New Android SDK introduced some lame-ass optimizations to the build system which we should take care about
 [ -x project/jni/application/src/AndroidPreBuild.sh ] && {

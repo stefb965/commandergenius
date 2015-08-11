@@ -71,12 +71,13 @@ class Globals
 	public static String[] AppTouchscreenKeyboardKeysNames = "Fire Shoot Switch_weapon Jump Run Hide/Seek".split(" ");
 	public static int StartupMenuButtonTimeout = 3000;
 	public static int AppMinimumRAM = 0;
-	public static SettingsMenu.Menu HiddenMenuOptions [] = {}; // If you see error here - update HiddenMenuOptions in your AndroidAppSettings.cfg: change OptionalDownloadConfig to SettingsMenuMisc.OptionalDownloadConfig etc.
+/*	public static SettingsMenu.Menu HiddenMenuOptions [] = {}; // If you see error here - update HiddenMenuOptions in your AndroidAppSettings.cfg: change OptionalDownloadConfig to SettingsMenuMisc.OptionalDownloadConfig etc.
 	public static SettingsMenu.Menu FirstStartMenuOptions [] = { new SettingsMenuMisc.ShowReadme(), (AppUsesMouse && ! ForceRelativeMouseMode ? new SettingsMenuMouse.DisplaySizeConfig() : new SettingsMenu.DummyMenu()), new SettingsMenuMisc.OptionalDownloadConfig(), new SettingsMenuMisc.GyroscopeCalibration() };
 	public static String AdmobPublisherId = "";
 	public static String AdmobTestDeviceId = "";
 	public static String AdmobBannerSize = "";
 	public static String GooglePlayGameServicesId = "";
+*/
 
 	// Phone-specific config, modified by user in "Change phone config" startup dialog
 	public static int VideoDepthBpp = 16;
@@ -97,12 +98,12 @@ class Globals
 	public static int AccelerometerCenterPos = 2;
 	public static int AudioBufferConfig = 0;
 	public static boolean OptionalDataDownload[] = null;
-	public static int LeftClickMethod = ForceRelativeMouseMode ? Mouse.LEFT_CLICK_WITH_TAP_OR_TIMEOUT : Mouse.LEFT_CLICK_NORMAL;
-	public static int LeftClickKey = KeyEvent.KEYCODE_DPAD_CENTER;
+//	public static int LeftClickMethod = ForceRelativeMouseMode ? Mouse.LEFT_CLICK_WITH_TAP_OR_TIMEOUT : Mouse.LEFT_CLICK_NORMAL;
+//	public static int LeftClickKey = KeyEvent.KEYCODE_DPAD_CENTER;
 	public static int LeftClickTimeout = 3;
 	public static int RightClickTimeout = 4;
-	public static int RightClickMethod = AppNeedsTwoButtonMouse ? Mouse.RIGHT_CLICK_WITH_MULTITOUCH : Mouse.RIGHT_CLICK_NONE;
-	public static int RightClickKey = KeyEvent.KEYCODE_MENU;
+//	public static int RightClickMethod = AppNeedsTwoButtonMouse ? Mouse.RIGHT_CLICK_WITH_MULTITOUCH : Mouse.RIGHT_CLICK_NONE;
+//	public static int RightClickKey = KeyEvent.KEYCODE_MENU;
 	public static boolean MoveMouseWithJoystick = false;
 	public static int MoveMouseWithJoystickSpeed = 1;
 	public static int MoveMouseWithJoystickAccel = 0;
@@ -112,15 +113,15 @@ class Globals
 	public static boolean RelativeMouseMovement = ForceRelativeMouseMode; // Laptop touchpad mode
 	public static int RelativeMouseMovementSpeed = 2;
 	public static int RelativeMouseMovementAccel = 0;
-	public static int ShowScreenUnderFinger = Mouse.ZOOM_NONE;
-	public static int ClickScreenPressure = 0;
+//	public static int ShowScreenUnderFinger = Mouse.ZOOM_NONE;
+//	public static int ClickScreenPressure = 0;
 	public static int ClickScreenTouchspotSize = 0;
 	public static boolean FingerHover = true;
 	public static boolean HoverJitterFilter = true;
 	public static boolean GenerateSubframeTouchEvents = false;
 	public static boolean KeepAspectRatio = KeepAspectRatioDefaultSetting;
-	public static int RemapHwKeycode[] = new int[SDL_Keys.JAVA_KEYCODE_LAST];
-	public static int RemapScreenKbKeycode[] = new int[6];
+//	public static int RemapHwKeycode[] = new int[SDL_Keys.JAVA_KEYCODE_LAST];
+//	public static int RemapScreenKbKeycode[] = new int[6];
 	public static int ScreenKbControlsLayout[][] =	AppUsesThirdJoystick ? // Values for 800x480 resolution
 													new int[][] { { 0, 303, 177, 480 }, { 0, 0, 48, 48 }, { 400, 392, 488, 480 }, { 312, 392, 400, 480 }, { 400, 304, 488, 392 }, { 312, 304, 400, 392 }, { 400, 216, 488, 304 }, { 312, 216, 400, 304 }, { 623, 303, 800, 480 }, { 623, 126, 800, 303 } } :
 													AppUsesSecondJoystick ?

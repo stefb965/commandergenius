@@ -24,9 +24,9 @@ package net.sourceforge.clonekeenplus;
 import org.libsdl.app.SDLActivity; 
 /*import android.app.Activity;
 import android.app.Service;
-import android.content.Context;
+import android.content.Context;*/
 import android.os.Bundle;
-import android.os.IBinder;
+/*import android.os.IBinder;
 import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -106,14 +106,14 @@ public class MainActivity extends SDLActivity
         System.loadLibrary("sdl_main");
         //System.loadLibrary("main");
     }
-/*
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		Settings.Load(this);
 		Settings.Apply(this);
 
-		setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		/*setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		instance = this;
 
@@ -125,11 +125,11 @@ public class MainActivity extends SDLActivity
 		if(Globals.InhibitSuspend)
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
 					WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-
+*/
+		
 		super.onCreate(savedInstanceState);
 
-		Log.i("SDL", "libSDL: Creating startup screen");
+		/*Log.i("SDL", "libSDL: Creating startup screen");
 		_layout = new LinearLayout(this);
 		_layout.setOrientation(LinearLayout.VERTICAL);
 		_layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
@@ -256,10 +256,10 @@ public class MainActivity extends SDLActivity
 			Intent intent = new Intent(this, DummyService.class);
 			startService(intent);
 		}
-		cloudSave = new CloudSave(this);
+		cloudSave = new CloudSave(this);*/
 	}
 	
-*/
+
 /*
 	public void setUpStatusLabel()
 	{
