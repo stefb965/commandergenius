@@ -26,14 +26,13 @@ import org.libsdl.app.SDLActivity;
 import android.app.Service;
 import android.content.Context;*/
 import android.os.Bundle;
-/*import android.os.IBinder;
+import android.os.IBinder;
 import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View;
 import android.view.ViewGroup;
-*/
 import android.widget.TextView;
 import android.widget.EditText;
 import android.text.Editable;
@@ -77,10 +76,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
+import android.os.SystemClock;*/
 import java.util.concurrent.Semaphore;
 import android.content.pm.ActivityInfo;
-*/
 import android.view.Display;
 import android.util.DisplayMetrics;
 import android.text.InputType;
@@ -134,10 +132,12 @@ public class MainActivity extends SDLActivity
 		
 		super.onCreate(savedInstanceState);
 
-		/*Log.i("SDL", "libSDL: Creating startup screen");
+		Log.i("SDL", "libSDL: Creating startup screen");
 		_layout = new LinearLayout(this);
 		_layout.setOrientation(LinearLayout.VERTICAL);
 		_layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+		
+
 		_layout2 = new LinearLayout(this);
 		_layout2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 		loadingDialog = new ProgressDialog(this);
@@ -171,7 +171,7 @@ public class MainActivity extends SDLActivity
 
 		_layout.addView(_layout2);
 
-		ImageView img = new ImageView(this);
+		/*ImageView img = new ImageView(this);
 
 		img.setScaleType(ImageView.ScaleType.FIT_CENTER );
 		//img.setScaleType(FIT_XY);
@@ -284,9 +284,10 @@ public class MainActivity extends SDLActivity
 			Parent._tv.setMaxLines(2); // To show some long texts on smaller devices
 			Parent._tv.setMinLines(2); // Otherwise the background picture is getting resized at random, which does not look good
 			Parent._tv.setText(R.string.init);
+
 			// Padding is a good idea because if the display device is a TV the edges might be cut off
 			Parent._tv.setPadding((int)(width * 0.1), (int)(height * 0.1), (int)(width * 0.1), 0);
-			Parent._layout2.addView(Parent._tv);
+			/* Parent._layout2.addView(Parent._tv); */ // TODO: Still crashes here...!
 		}
 	}
 
@@ -1453,7 +1454,7 @@ public class MainActivity extends SDLActivity
 		return getOrient.getWidth() >= getOrient.getHeight();
 	}
 */
-/*
+
 	void setScreenOrientation()
 	{
 		if( !Globals.AutoDetectOrientation && getIntent().getBooleanExtra(RestartMainActivity.ACTIVITY_AUTODETECT_SCREEN_ORIENTATION, false) )
@@ -1471,7 +1472,7 @@ public class MainActivity extends SDLActivity
 		else
 			setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	}
-*/
+
 /*
 	public FrameLayout getVideoLayout() { return _videoLayout; } 
 */
