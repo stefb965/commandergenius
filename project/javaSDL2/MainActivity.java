@@ -81,7 +81,9 @@ import android.content.pm.ActivityInfo;
 import android.view.Display;
 import android.util.DisplayMetrics;
 import android.text.InputType;
+*/
 import android.util.Log;
+/*
 import android.view.Surface;
 import android.app.ProgressDialog;
 import android.app.KeyguardManager;
@@ -285,11 +287,11 @@ public class MainActivity extends SDLActivity
 		}
 	}
 */
-/*
+
 	public void startDownloader()
 	{
 		Log.i("SDL", "libSDL: Starting data downloader");
-		class Callback implements Runnable
+		/*class Callback implements Runnable
 		{
 			public MainActivity Parent;
 			public void run()
@@ -302,9 +304,9 @@ public class MainActivity extends SDLActivity
 		}
 		Callback cb = new Callback();
 		cb.Parent = this;
-		this.runOnUiThread(cb);
+		this.runOnUiThread(cb);*/
 	}
-*/
+
 /*
 	public void initSDL()
 	{

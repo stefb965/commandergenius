@@ -21,7 +21,6 @@ freely, subject to the following restrictions:
 
 package net.sourceforge.clonekeenplus;
 
-/*import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -29,10 +28,10 @@ import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-*/
+
 import android.util.Log;
-/*
 import java.io.*;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Environment;
@@ -76,7 +75,7 @@ import android.hardware.Sensor;
 import android.widget.Toast;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.content.Intent;*/
+import android.content.Intent;
 
 
 // TODO: too much code here, split into multiple files, possibly auto-generated menus?
@@ -87,10 +86,10 @@ class Settings
 	static boolean settingsLoaded = false;
 	static boolean settingsChanged = false;
 	static final int SETTINGS_FILE_VERSION = 5;
-/*
+
 	static void Save(final MainActivity p)
 	{
-		try {
+		/*try {
 			ObjectOutputStream out = new ObjectOutputStream(p.openFileOutput( SettingsFileName, p.MODE_WORLD_READABLE ));
 			out.writeInt(SETTINGS_FILE_VERSION);
 			out.writeBoolean(Globals.DownloadToSdcard);
@@ -192,8 +191,8 @@ class Settings
 			
 		} catch( FileNotFoundException e ) {
 		} catch( SecurityException e ) {
-		} catch ( IOException e ) {};
-	}*/
+		} catch ( IOException e ) {};*/
+	}
 
 	static void Load( final MainActivity p )
 	{
@@ -821,7 +820,7 @@ class Settings
 	
 	static boolean checkRamSize(final MainActivity p)
 	{
-		/*try {
+		try {
 			BufferedReader reader = new BufferedReader(new FileReader("/proc/meminfo"));
 			String line = null;
 			while( ( line = reader.readLine() ) != null )
@@ -870,7 +869,7 @@ class Settings
 			}
 		} catch ( Exception e ) {
 			Log.i("SDL", "Error: cannot parse /proc/meminfo: " + e.toString());
-		}*/
+		}
 		return true;
 	}
 	

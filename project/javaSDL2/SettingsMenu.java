@@ -30,10 +30,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.util.Log;
-import java.io.*;
+import java.io.*;*/
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Environment;
+/*import android.os.Environment;
 import android.os.StatFs;
 import java.util.Locale;*/
 import java.util.ArrayList;
@@ -78,7 +78,7 @@ class SettingsMenu
 	public static abstract class Menu
 	{
 		// Should be overridden by children
-		/*abstract void run(final MainActivity p);
+		abstract void run(final MainActivity p);
 		abstract String title(final MainActivity p);
 		boolean enabled()
 		{
@@ -136,7 +136,7 @@ class SettingsMenu
 			AlertDialog alert = builder.create();
 			alert.setOwnerActivity(p);
 			alert.show();
-		}*/
+		}
 	}
 
 	static ArrayList<Menu> menuStack = new ArrayList<Menu> ();
@@ -182,7 +182,7 @@ class SettingsMenu
 			goBack(p);
 		}*/
 	}
-/*
+
 	static void goBack(final MainActivity p)
 	{
 		if(menuStack.isEmpty())
@@ -226,7 +226,7 @@ class SettingsMenu
 		{
 			goBack(p);
 		}
-	}*/
+	}
 
 	static class MainMenu extends Menu
 	{
@@ -236,9 +236,9 @@ class SettingsMenu
 		}
 		void run (final MainActivity p)
 		{
-			/*Menu options[] =
+			Menu options[] =
 			{
-				new SettingsMenuMisc.DownloadConfig(),
+				/*new SettingsMenuMisc.DownloadConfig(),
 				new SettingsMenuMisc.OptionalDownloadConfig(false),
 				new SettingsMenuKeyboard.KeyboardConfigMainMenu(),
 				new SettingsMenuMouse.MouseConfigMainMenu(),
@@ -247,10 +247,10 @@ class SettingsMenu
 				new SettingsMenuKeyboard.RemapHwKeysConfig(),
 				new SettingsMenuKeyboard.ScreenGesturesConfig(),
 				new SettingsMenuMisc.VideoSettingsConfig(),
-				new SettingsMenuMisc.ResetToDefaultsConfig(),
+				new SettingsMenuMisc.ResetToDefaultsConfig(),*/
 				new OkButton(),
 			};
-			showMenuOptionsList(p, options);*/
+			showMenuOptionsList(p, options);
 		}
 	}
 }
