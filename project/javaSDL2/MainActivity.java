@@ -33,6 +33,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.View;
 import android.view.ViewGroup;
+*/
 import android.widget.TextView;
 import android.widget.EditText;
 import android.text.Editable;
@@ -40,6 +41,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.FrameLayout;
+/*
 import android.graphics.drawable.Drawable;
 import android.graphics.Color;
 import android.content.res.Configuration;
@@ -78,15 +80,16 @@ import android.os.Message;
 import android.os.SystemClock;
 import java.util.concurrent.Semaphore;
 import android.content.pm.ActivityInfo;
+*/
 import android.view.Display;
 import android.util.DisplayMetrics;
 import android.text.InputType;
-*/
 import android.util.Log;
 /*
 import android.view.Surface;
+*/
 import android.app.ProgressDialog;
-import android.app.KeyguardManager;
+/*import android.app.KeyguardManager;
 import android.view.ViewTreeObserver;
 import android.graphics.Rect;
 import android.view.InputDevice;
@@ -262,7 +265,7 @@ public class MainActivity extends SDLActivity
 	}
 	
 
-/*
+
 	public void setUpStatusLabel()
 	{
 		MainActivity Parent = this; // Too lazy to rename
@@ -286,7 +289,7 @@ public class MainActivity extends SDLActivity
 			Parent._layout2.addView(Parent._tv);
 		}
 	}
-*/
+
 
 	public void startDownloader()
 	{
@@ -1479,7 +1482,7 @@ public class MainActivity extends SDLActivity
 	//private static AudioThread mAudioThread = null; // TODO: Gerstrong, disabled because SDL 2.0 take leadership
 /*	private boolean mLibsLoaded = false;
 	private static DataDownloader downloader = null;
-
+*/
 	private TextView _tv = null;
 	private Button _btn = null;
 	private LinearLayout _layout = null;
@@ -1488,7 +1491,7 @@ public class MainActivity extends SDLActivity
 	public CloudSave cloudSave = null;
 	public ProgressDialog loadingDialog = null;
 
-	FrameLayout _videoLayout = null;
+/*	FrameLayout _videoLayout = null;
 	private View _screenKeyboard = null;
 	private String _screenKeyboardHintMessage = null;
 	static boolean keyboardWithoutTextInputShown = false;

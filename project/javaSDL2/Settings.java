@@ -201,6 +201,8 @@ class Settings
 			return;
 		}
 		Log.i("SDL", "libSDL: Settings.Load(): enter");
+		// The upcoming code was using in the SDL 1.2. It is unsure what really will be needed.
+		// A lot of 
 /*		nativeInitKeymap(); 
 		if( p.isRunningOnOUYA() )
 			nativeSetKeymapKey(KeyEvent.KEYCODE_MENU, nativeGetKeymapKey(KeyEvent.KEYCODE_BACK)); // Ouya does not have Back key, only Menu, so remap Back keycode to Menu
@@ -446,8 +448,8 @@ class Settings
 		}
 
 		Log.i("SDL", "libSDL: Settings.Load(): loading settings failed, running config dialog");
-		p.setScreenOrientation();
-		p.setUpStatusLabel();*/
+		p.setScreenOrientation();*/
+		p.setUpStatusLabel();
 		if( checkRamSize(p) )
 			SettingsMenu.showConfig(p, true);
 	}
