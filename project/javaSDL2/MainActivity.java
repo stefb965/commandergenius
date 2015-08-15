@@ -53,7 +53,9 @@ import android.view.MenuItem;
 import android.view.Menu;
 import android.view.Gravity;
 import android.text.method.TextKeyListener;
+*/
 import java.util.LinkedList;
+/*
 import java.io.SequenceInputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -70,9 +72,9 @@ import java.util.Set;
 import android.text.SpannedString;
 import java.io.BufferedReader;
 import java.io.BufferedInputStream;
-import java.io.InputStreamReader;
+import java.io.InputStreamReader;*/
 import android.view.inputmethod.InputMethodManager;
-import android.content.pm.PackageInfo;
+/*import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
@@ -113,6 +115,9 @@ public class MainActivity extends SDLActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		// super is in this case the SDL Activity and it is the first that has to start.
+		super.onCreate(savedInstanceState);
+
 		Settings.Load(this);
 		Settings.Apply(this);
 
@@ -130,18 +135,19 @@ public class MainActivity extends SDLActivity
 					WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 */
 		
-		super.onCreate(savedInstanceState);
+
 
 		Log.i("SDL", "libSDL: Creating startup screen");
-		_layout = new LinearLayout(this);
+/*		_layout = new LinearLayout(this);
 		_layout.setOrientation(LinearLayout.VERTICAL);
-		_layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+		_layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));*/
 		
 
 		_layout2 = new LinearLayout(this);
-		_layout2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-		loadingDialog = new ProgressDialog(this);
-		loadingDialog.setMessage(getString(R.string.accessing_network));
+//		_layout2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+//		_layout2.setLayoutParams(new LinearLayout.LayoutParams(mLayout.LayoutParams.FILL_PARENT, mLayout.LayoutParams.WRAP_CONTENT));
+		/*loadingDialog = new ProgressDialog(this);
+		loadingDialog.setMessage(getString(R.string.accessing_network));*/
 
 		final Semaphore loadedLibraries = new Semaphore(0);
 
@@ -149,9 +155,9 @@ public class MainActivity extends SDLActivity
 		{
 			_btn = new Button(this);
 			_btn.setEnabled(false);
-			_btn.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+//			_btn.setLayoutParams(new mLayout.LayoutParams(mLayout.LayoutParams.FILL_PARENT, mLayout.LayoutParams.WRAP_CONTENT));
 			_btn.setText(getResources().getString(R.string.device_change_cfg));
-			class onClickListener implements View.OnClickListener
+			/*class onClickListener implements View.OnClickListener
 			{
 					public MainActivity p;
 					onClickListener( MainActivity _p ) { p = _p; }
@@ -164,12 +170,13 @@ public class MainActivity extends SDLActivity
 						SettingsMenu.showConfig(p, false);
 					}
 			};
-			_btn.setOnClickListener(new onClickListener(this));
+			_btn.setOnClickListener(new onClickListener(this));*/
 
 			_layout2.addView(_btn);
 		}
 
-		_layout.addView(_layout2);
+		mLayout.addView(_layout2); // Not sure if we use continue using this layout. So far _layout is disabled.
+//		_layout.addView(_layout2);
 
 		/*ImageView img = new ImageView(this);
 
@@ -280,6 +287,7 @@ public class MainActivity extends SDLActivity
 			Display display = getWindowManager().getDefaultDisplay();
 			int width = display.getWidth();
 			int height = display.getHeight();
+
 			Parent._tv = new TextView(Parent);
 			Parent._tv.setMaxLines(2); // To show some long texts on smaller devices
 			Parent._tv.setMinLines(2); // Otherwise the background picture is getting resized at random, which does not look good
@@ -287,7 +295,7 @@ public class MainActivity extends SDLActivity
 
 			// Padding is a good idea because if the display device is a TV the edges might be cut off
 			Parent._tv.setPadding((int)(width * 0.1), (int)(height * 0.1), (int)(width * 0.1), 0);
-			/* Parent._layout2.addView(Parent._tv); */ // TODO: Still crashes here...!
+			Parent._layout2.addView(Parent._tv);
 		}
 	}
 
@@ -1499,26 +1507,26 @@ public class MainActivity extends SDLActivity
 	private boolean sdlInited = false;
 	public static boolean ApplicationLibraryLoaded = false;
 */
-/*
+
 	public interface TouchEventsListener
 	{
 		public void onTouchEvent(final MotionEvent ev);
 	}
-*/
-/*
+
+
 	public interface KeyEventsListener
 	{
 		public void onKeyEvent(final int keyCode);
 	}
 
-/*
+
 	public TouchEventsListener touchListener = null;
 	public KeyEventsListener keyListener = null;
 	boolean _isPaused = false;
 	private InputMethodManager _inputManager = null;
 
 	public LinkedList<Integer> textInput = new LinkedList<Integer> ();
-	public static MainActivity instance = null;*/
+	public static MainActivity instance = null;
 }
 
 // *** HONEYCOMB / ICS FIX FOR FULLSCREEN MODE, by lmak ***

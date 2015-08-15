@@ -413,7 +413,7 @@ class Settings
 				Log.i("SDL", "libSDL: old cfg version unknown or too old, our version " + p.getApplicationVersion() + " and we need to clean up config file");
 				DeleteSdlConfigOnUpgradeAndRestart(p);
 			}
-		};
+		};*/
 		
 		if( Globals.DataDir.length() == 0 )
 		{
@@ -448,8 +448,10 @@ class Settings
 		}
 
 		Log.i("SDL", "libSDL: Settings.Load(): loading settings failed, running config dialog");
-		p.setScreenOrientation();*/
-		p.setUpStatusLabel();
+		p.setScreenOrientation();
+
+		//p.setUpStatusLabel(); // NOTE: I think we cannot call this, because p._layout2 might be null
+
 		if( checkRamSize(p) )
 			SettingsMenu.showConfig(p, true);
 	}
@@ -712,7 +714,7 @@ class Settings
 				nativeSetupScreenKeyboardButtons(loadRaw(p, R.raw.n64));
 		}
 	}
-
+*/
 	abstract static class SdcardAppPath
 	{
 		private static SdcardAppPath get()
@@ -818,7 +820,7 @@ class Settings
 				return Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + p.getPackageName() + "/files";
 			}
 		}
-	}*/
+	}
 	
 	static boolean checkRamSize(final MainActivity p)
 	{
