@@ -206,7 +206,7 @@ public class MainActivity extends SDLActivity
     // TODO: I think _videoLayout must should only reference to mLayout of SDLActivity
 		//setContentView(_videoLayout);
 
-		/*class Callback implements Runnable
+		class Callback implements Runnable
 		{
 			MainActivity p;
 			Callback( MainActivity _p ) { p = _p; }
@@ -222,7 +222,7 @@ public class MainActivity extends SDLActivity
 					Log.i("SDL", "libSDL: Loading libraries");
 					p.LoadLibraries();
 					mLibsLoaded = true;
-					//p.mAudioThread = new AudioThread(p);
+					//p.mAudioThread = new AudioThread(p); // TODO: SDL 2.0 should handle that.
 					Log.i("SDL", "libSDL: Loading settings");
 					final Semaphore loaded = new Semaphore(0);
 					class Callback2 implements Runnable
@@ -262,7 +262,7 @@ public class MainActivity extends SDLActivity
 				}
 			}
 		};
-		(new Thread(new Callback(this))).start();*/
+		(new Thread(new Callback(this))).start();
 
 		if( Globals.CreateService )
 		{
@@ -1145,10 +1145,10 @@ public class MainActivity extends SDLActivity
 		setIntent(i);
 	}
 */
-/*
+
 	public void LoadLibraries()
 	{
-		try
+		/*try
 		{
 			if(Globals.NeedGles2)
 				System.loadLibrary("GLESv2");
@@ -1385,15 +1385,15 @@ public class MainActivity extends SDLActivity
 			{
 				//Log.i("SDL", "libSDL: Error: " + eee.toString());
 			}
-		}
+		}*/
 	};
-*/
 
-/*
+
+
 	public static void LoadApplicationLibrary(final Context context)
 	{
 		Settings.nativeChdir(Globals.DataDir);
-		for(String l : Globals.AppMainLibraries)
+		/*for(String l : Globals.AppMainLibraries)
 		{
 			try
 			{
@@ -1418,11 +1418,11 @@ public class MainActivity extends SDLActivity
 					System.loadLibrary(l);
 				}
 			}
-		}
+		}*/
 		Log.v("SDL", "libSDL: loaded all libraries");
 		ApplicationLibraryLoaded = true;
 	}
-*/
+
 /*
 	public int getApplicationVersion()
 	{
@@ -1490,9 +1490,9 @@ public class MainActivity extends SDLActivity
 
 	//DemoGLSurfaceView mGLView = null; // TODO: Gerstrong, disabled because SDL 2.0 take leadership
 	//private static AudioThread mAudioThread = null; // TODO: Gerstrong, disabled because SDL 2.0 take leadership
-/*	private boolean mLibsLoaded = false;
+	private boolean mLibsLoaded = false;
 	private static DataDownloader downloader = null;
-*/
+
 	private TextView _tv = null;
 	private Button _btn = null;
 	private LinearLayout _layout = null;
@@ -1505,9 +1505,8 @@ public class MainActivity extends SDLActivity
 /*	private View _screenKeyboard = null;
 	private String _screenKeyboardHintMessage = null;
 	static boolean keyboardWithoutTextInputShown = false;
-	private boolean sdlInited = false;
+	private boolean sdlInited = false;*/
 	public static boolean ApplicationLibraryLoaded = false;
-*/
 
 	public interface TouchEventsListener
 	{
