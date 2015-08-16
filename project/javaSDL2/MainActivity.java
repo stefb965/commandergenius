@@ -13,7 +13,7 @@ freely, subject to the following restrictions:
 1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
    in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required. 
+   appreciated but is not required.
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
@@ -21,7 +21,7 @@ freely, subject to the following restrictions:
 
 package net.sourceforge.clonekeenplus;
 
-import org.libsdl.app.SDLActivity; 
+import org.libsdl.app.SDLActivity;
 /*import android.app.Activity;
 import android.app.Service;
 import android.content.Context;*/
@@ -96,12 +96,12 @@ import android.view.InputDevice;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.Keyboard;*/
 
-/* 
- * A sample wrapper class that just calls SDLActivity 
- */ 
+/*
+ * A sample wrapper class that just calls SDLActivity
+ */
 
-public class MainActivity extends SDLActivity 
-{ 
+public class MainActivity extends SDLActivity
+{
 
     // Load the .so files
     static {
@@ -117,14 +117,15 @@ public class MainActivity extends SDLActivity
 	{
 		// super is in this case the SDL Activity and it is the first that has to start.
 		super.onCreate(savedInstanceState);
+    super.onPause();
 
 		Settings.Load(this);
 		Settings.Apply(this);
 
-		/*setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		instance = this;
-
+/*  TODO: Not sure if the follwing commented code should be used. At least now it crashes... Remember SDLActivity is active
 		// fullscreen mode
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -134,20 +135,19 @@ public class MainActivity extends SDLActivity
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
 					WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 */
-		
+
 
 
 		Log.i("SDL", "libSDL: Creating startup screen");
-/*		_layout = new LinearLayout(this);
+		_layout = new LinearLayout(this);
 		_layout.setOrientation(LinearLayout.VERTICAL);
-		_layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));*/
-		
+		_layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+
 
 		_layout2 = new LinearLayout(this);
-//		_layout2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-//		_layout2.setLayoutParams(new LinearLayout.LayoutParams(mLayout.LayoutParams.FILL_PARENT, mLayout.LayoutParams.WRAP_CONTENT));
-		/*loadingDialog = new ProgressDialog(this);
-		loadingDialog.setMessage(getString(R.string.accessing_network));*/
+		_layout2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+		loadingDialog = new ProgressDialog(this);
+		loadingDialog.setMessage(getString(R.string.accessing_network));
 
 		final Semaphore loadedLibraries = new Semaphore(0);
 
@@ -155,9 +155,9 @@ public class MainActivity extends SDLActivity
 		{
 			_btn = new Button(this);
 			_btn.setEnabled(false);
-//			_btn.setLayoutParams(new mLayout.LayoutParams(mLayout.LayoutParams.FILL_PARENT, mLayout.LayoutParams.WRAP_CONTENT));
+			_btn.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 			_btn.setText(getResources().getString(R.string.device_change_cfg));
-			/*class onClickListener implements View.OnClickListener
+			class onClickListener implements View.OnClickListener
 			{
 					public MainActivity p;
 					onClickListener( MainActivity _p ) { p = _p; }
@@ -170,13 +170,12 @@ public class MainActivity extends SDLActivity
 						SettingsMenu.showConfig(p, false);
 					}
 			};
-			_btn.setOnClickListener(new onClickListener(this));*/
+			_btn.setOnClickListener(new onClickListener(this));
 
 			_layout2.addView(_btn);
 		}
 
-		mLayout.addView(_layout2); // Not sure if we use continue using this layout. So far _layout is disabled.
-//		_layout.addView(_layout2);
+		_layout.addView(_layout2);
 
 		/*ImageView img = new ImageView(this);
 
@@ -192,7 +191,7 @@ public class MainActivity extends SDLActivity
 		}
 		img.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 		_layout.addView(img);
-		
+
 		_videoLayout = new FrameLayout(this);
 		_videoLayout.addView(_layout);
 
@@ -202,7 +201,7 @@ public class MainActivity extends SDLActivity
 			_videoLayout.addView(_ad.getView());
 			_ad.getView().setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT));
 		}
-		
+
 		setContentView(_videoLayout);
 
 		class Callback implements Runnable
@@ -270,7 +269,7 @@ public class MainActivity extends SDLActivity
 		}
 		cloudSave = new CloudSave(this);*/
 	}
-	
+
 
 
 	public void setUpStatusLabel()
@@ -375,7 +374,7 @@ public class MainActivity extends SDLActivity
 		if(sdlInited)
 			return;
 		Log.i("SDL", "libSDL: Initializing video and SDL application");
-		
+
 		sdlInited = true;
 		DimSystemStatusBar.get().dim(_videoLayout);
 		_videoLayout.removeView(_layout);
@@ -404,7 +403,7 @@ public class MainActivity extends SDLActivity
 		//DimSystemStatusBar.get().dim(mGLView);
 
 		// Here it seems that the correct resolution rect for the device is
-		// We need to pass this to SDL 2.0 
+		// We need to pass this to SDL 2.0
 
 		Rect r = new Rect();
 		_videoLayout.getWindowVisibleDisplayFrame(r);
@@ -495,7 +494,7 @@ public class MainActivity extends SDLActivity
 			onResume();
 	}
 */
-/*	
+/*
 	public boolean isPaused()
 	{
 		return _isPaused;
@@ -689,7 +688,7 @@ public class MainActivity extends SDLActivity
 					_parent.hideScreenKeyboard();
 					return true;
 				}
-				
+
 				//if (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_CLEAR)
 				//{
 				//	// EditText deletes two characters at a time, here's a hacky fix
@@ -712,14 +711,14 @@ public class MainActivity extends SDLActivity
 				//		return true;
 				//	}
 				//}
-				
+
 				//Log.i("SDL", "Key " + keyCode + " flags " + event.getFlags() + " action " + event.getAction());
 				return false;
 			}
 		};
 		EditText screenKeyboard = new EditText(this);
 		// This code does not work
-		
+
 		//screenKeyboard.setMaxLines(100);
 		//ViewGroup.LayoutParams layout = _screenKeyboard.getLayoutParams();
 		//if( layout != null )
@@ -729,7 +728,7 @@ public class MainActivity extends SDLActivity
 		//	screenKeyboard.setLayoutParams(layout);
 		//}
 		//screenKeyboard.setGravity(android.view.Gravity.BOTTOM | android.view.Gravity.LEFT);
-		
+
 		String hint = _screenKeyboardHintMessage;
 		screenKeyboard.setHint(hint != null ? hint : getString(R.string.text_edit_click_here));
 		screenKeyboard.setText(oldText);
@@ -812,7 +811,7 @@ public class MainActivity extends SDLActivity
 		return _screenKeyboard != null;
 	};
 */
-/*	
+/*
 	public void setScreenKeyboardHintMessage(String s)
 	{
 		_screenKeyboardHintMessage = s;
@@ -837,7 +836,7 @@ public class MainActivity extends SDLActivity
 
 	public void setAdvertisementPosition(int x, int y)
 	{
-		
+
 		if( _ad.getView() != null )
 		{
 			final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -953,7 +952,7 @@ public class MainActivity extends SDLActivity
 		return true;
 	}
 */
-/*	
+/*
 	@Override
 	public boolean onKeyUp(int keyCode, final KeyEvent event)
 	{
@@ -1067,7 +1066,7 @@ public class MainActivity extends SDLActivity
 	{
 		super.onConfigurationChanged(newConfig);
 		updateScreenOrientation();
-		
+
 		//if (oldConfig != null)
 		//{
 		//	int diff = newConfig.diff(oldConfig);
@@ -1144,7 +1143,7 @@ public class MainActivity extends SDLActivity
 		setIntent(i);
 	}
 */
-/*	
+/*
 	public void LoadLibraries()
 	{
 		try
@@ -1192,7 +1191,7 @@ public class MainActivity extends SDLActivity
 		{
 			try {
 				Log.i("SDL", "libSDL: Extracting APP2SD-ed libs");
-				
+
 				InputStream in = null;
 				try
 				{
@@ -1216,16 +1215,16 @@ public class MainActivity extends SDLActivity
 				try {
 					libDir.mkdirs();
 				} catch( SecurityException ee ) { };
-				
+
 				byte[] buf = new byte[16384];
 				while(true)
 				{
 					ZipEntry entry = null;
 					entry = zip.getNextEntry();
-					
+
 					//if( entry != null )
 					//	Log.i("SDL", "Extracting lib " + entry.getName());
-					
+
 					if( entry == null )
 					{
 						Log.i("SDL", "Extracting libs finished");
@@ -1284,7 +1283,7 @@ public class MainActivity extends SDLActivity
 		{
 			try {
 				Log.i("SDL", "libSDL: Trying to extract binaries from assets " + binaryZip);
-				
+
 				InputStream in = null;
 				try
 				{
@@ -1316,16 +1315,16 @@ public class MainActivity extends SDLActivity
 				try {
 					libDir.mkdirs();
 				} catch( SecurityException ee ) { };
-				
+
 				byte[] buf = new byte[16384];
 				while(true)
 				{
 					ZipEntry entry = null;
 					entry = zip.getNextEntry();
-					
+
 					//if( entry != null )
 					//	Log.i("SDL", "Extracting lib " + entry.getName());
-					
+
 					if( entry == null )
 					{
 						Log.i("SDL", "Extracting binaries finished");
@@ -1482,7 +1481,7 @@ public class MainActivity extends SDLActivity
 	}
 
 /*
-	public FrameLayout getVideoLayout() { return _videoLayout; } 
+	public FrameLayout getVideoLayout() { return _videoLayout; }
 */
 
 //	static int NOTIFY_ID = 12367098; // Random ID
