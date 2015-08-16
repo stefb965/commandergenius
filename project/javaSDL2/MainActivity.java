@@ -22,9 +22,8 @@ freely, subject to the following restrictions:
 package net.sourceforge.clonekeenplus;
 
 import org.libsdl.app.SDLActivity;
-/*import android.app.Activity;
 import android.app.Service;
-import android.content.Context;*/
+import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.MotionEvent;
@@ -40,20 +39,22 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.FrameLayout;
-/*
 import android.graphics.drawable.Drawable;
+/*
 import android.graphics.Color;
 import android.content.res.Configuration;
 import android.app.Notification;
 import android.app.NotificationManager;
+*/
 import android.app.PendingIntent;
 import android.content.Intent;
+/*
 import android.view.View.OnKeyListener;
 import android.view.MenuItem;
 import android.view.Menu;
+*/
 import android.view.Gravity;
 import android.text.method.TextKeyListener;
-*/
 import java.util.LinkedList;
 /*
 import java.io.SequenceInputStream;
@@ -177,7 +178,7 @@ public class MainActivity extends SDLActivity
 
 		_layout.addView(_layout2);
 
-		/*ImageView img = new ImageView(this);
+		ImageView img = new ImageView(this);
 
 		img.setScaleType(ImageView.ScaleType.FIT_CENTER );
 		//img.setScaleType(FIT_XY);
@@ -202,9 +203,10 @@ public class MainActivity extends SDLActivity
 			_ad.getView().setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT));
 		}
 
-		setContentView(_videoLayout);
+    // TODO: I think _videoLayout must should only reference to mLayout of SDLActivity
+		//setContentView(_videoLayout);
 
-		class Callback implements Runnable
+		/*class Callback implements Runnable
 		{
 			MainActivity p;
 			Callback( MainActivity _p ) { p = _p; }
@@ -260,14 +262,14 @@ public class MainActivity extends SDLActivity
 				}
 			}
 		};
-		(new Thread(new Callback(this))).start();
+		(new Thread(new Callback(this))).start();*/
 
 		if( Globals.CreateService )
 		{
 			Intent intent = new Intent(this, DummyService.class);
 			startService(intent);
 		}
-		cloudSave = new CloudSave(this);*/
+		cloudSave = new CloudSave(this);
 	}
 
 
@@ -1499,8 +1501,8 @@ public class MainActivity extends SDLActivity
 	public CloudSave cloudSave = null;
 	public ProgressDialog loadingDialog = null;
 
-/*	FrameLayout _videoLayout = null;
-	private View _screenKeyboard = null;
+	FrameLayout _videoLayout = null; // TODO: Not if we should reference this to the Layout used by SDL 2.0
+/*	private View _screenKeyboard = null;
 	private String _screenKeyboardHintMessage = null;
 	static boolean keyboardWithoutTextInputShown = false;
 	private boolean sdlInited = false;
@@ -1603,7 +1605,7 @@ abstract class SetLayerType
 	}
 }
 */
-/*
+
 class DummyService extends Service
 {
 	public DummyService()
@@ -1625,4 +1627,3 @@ class DummyService extends Service
 		return null;
 	}
 }
-*/
