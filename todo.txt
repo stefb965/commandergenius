@@ -5,11 +5,7 @@ TODO, which will get actually done
 
 - TeeWorlds: navigate UI with gamepad.
 
-- OpenArena: tapping and holding joystick will disable Jump button.
-
 - OpenArena: cardboard VR mode.
-
-- SDL: CompatibilityHacksForceScreenUpdate=y does not redraw screen when invoking from background.
 
 - SDL: implement SDL_GL_LoadLibrary() / SDL_GL_GetProcAddress() / SDL_GL_SetAttribute() / SDL_GL_GetAttribute().
 
@@ -18,8 +14,6 @@ TODO, which will get actually done
 - USB Keyboard: options for camera feed size and for redefining remote menu hotkey, control mouse with gyroscope.
 
 - OpenTTD: 24bpp color mode + 32bpp blitter in SDL menu.
-
-- OpenTTD: multiplayer chat GUI is broken.
 
 - SDL: add option for non-fullscreen non-immersive mode.
 

@@ -195,6 +195,7 @@ echo "# 0 or empty - standard Android keyboard" >> AndroidAppSettings.cfg
 echo "# 1 - Simple QWERTY keyboard, no function keys, no arrow keys" >> AndroidAppSettings.cfg
 echo "# 2 - Commodore 64 keyboard" >> AndroidAppSettings.cfg
 echo "# 3 - Amiga keyboard" >> AndroidAppSettings.cfg
+echo "# 4 - Atari800 keyboard" >> AndroidAppSettings.cfg
 echo TextInputKeyboard=$TextInputKeyboard >> AndroidAppSettings.cfg
 echo >> AndroidAppSettings.cfg
 echo "# Hack for broken devices: prevent audio chopping, by sleeping a bit after pushing each audio chunk (y)/(n)" >> AndroidAppSettings.cfg
@@ -316,6 +317,11 @@ echo "# 1 = Simple Theme by Beholder (white, with cross joystick)" >> AndroidApp
 echo "# 2 = Sun by Sirea (yellow, with round joystick)" >> AndroidAppSettings.cfg
 echo "# 3 = Keen by Gerstrong (multicolor, with round joystick)" >> AndroidAppSettings.cfg
 echo "# 4 = Retro by Santiago Radeff (red/white, with cross joystick)" >> AndroidAppSettings.cfg
+echo "# 5 = GameBoy from RetroArch" >> AndroidAppSettings.cfg
+echo "# 6 = PlayStation from RetroArch" >> AndroidAppSettings.cfg
+echo "# 7 = SuperNintendo from RetroArch" >> AndroidAppSettings.cfg
+echo "# 8 = DualShock from RetroArch" >> AndroidAppSettings.cfg
+echo "# 9 = Nintendo64 from RetroArch" >> AndroidAppSettings.cfg
 echo TouchscreenKeysTheme=$TouchscreenKeysTheme >> AndroidAppSettings.cfg
 echo >> AndroidAppSettings.cfg
 echo "# Redefine gamepad keys to SDL keysyms, button order is:" >> AndroidAppSettings.cfg
@@ -921,14 +927,16 @@ else
 		ln -s -f $SDK_DIR/extras/android/compatibility/v4/android-support-v4.jar project/libs
 	}
 	[ -e $SDK_DIR/extras/google/google_play_services/libproject/google-play-services_lib/build.xml ] || \
-		android update project -t android-22 -p $SDK_DIR/extras/google/google_play_services/libproject/google-play-services_lib
+		android update project -t android-23 -p $SDK_DIR/extras/google/google_play_services/libproject/google-play-services_lib
 	[ -e $SDK_DIR/extras/android/compatibility/v7/mediarouter/build.xml ] || { \
-		android update project -t android-22 -p $SDK_DIR/extras/android/compatibility/v7/mediarouter
+		android update project -t android-23 -p $SDK_DIR/extras/android/compatibility/v7/mediarouter
 		echo 'android.library.reference.1=../../../../../../../../../../../../../../${sdk.dir}/extras/android/compatibility/v7/appcompat' >> $SDK_DIR/extras/android/compatibility/v7/mediarouter/local.properties
 	}
 	[ -e $SDK_DIR/extras/android/compatibility/v7/appcompat/build.xml ] || \
-		android update project -t android-22 -p $SDK_DIR/extras/android/compatibility/v7/appcompat
+		android update project -t android-23 -p $SDK_DIR/extras/android/compatibility/v7/appcompat
 fi
+
+ln -s -f $SDK_DIR/platforms/android-23/optional/org.apache.http.legacy.jar project/libs
 
 if [ -e project/jni/application/src/project.patch ]; then patch -p1 --no-backup-if-mismatch < project/jni/application/src/project.patch || exit 1 ; fi
 
@@ -966,5 +974,9 @@ ln -s "`which ndk-build | sed 's@/ndk-build@@'`/sources/android/support" project
 if uname -s | grep -i "darwin" > /dev/null ; then
 	find project/src -name "*.killme.tmp" -delete
 fi
+
+echo Compiling prebuilt libraries
+
+make -C project/jni -f Makefile.prebuilt
 
 echo Done
