@@ -39,6 +39,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.graphics.drawable.Drawable;
 import android.graphics.Color;
 import android.content.res.Configuration;
@@ -89,6 +90,14 @@ import android.graphics.Rect;
 import android.view.InputDevice;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.Keyboard;
+import android.app.Notification;
+import android.app.PendingIntent;
+import java.util.TreeSet;
+import android.app.UiModeManager;
+import android.Manifest;
+import android.content.pm.PermissionInfo;
+import java.util.Arrays;
+
 
 public class MainActivity extends Activity
 {
@@ -226,10 +235,30 @@ public class MainActivity extends Activity
 		(new Thread(new Callback(this))).start();
 		if( Globals.CreateService )
 		{
+			Log.v("SDL", "Starting dummy service - displaying notification");
 			Intent intent = new Intent(this, DummyService.class);
 			startService(intent);
 		}
 		cloudSave = new CloudSave(this);
+		// Request SD card permission right during start, because game devs don't care about runtime permissions and stuff
+		try
+		{
+			if( android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M )
+			{
+				PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA);
+				Log.v("SDL", "SD card permission 1: " + getPackageName() + " perms " + info.requestedPermissions + " name " + info.packageName + " ver " + info.versionName);
+				if( info.requestedPermissions != null && Arrays.asList(info.requestedPermissions).contains(Manifest.permission.WRITE_EXTERNAL_STORAGE) )
+				{
+					Log.v("SDL", "SD card permission 4: REQUEST");
+					int permissionCheck = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+					if (permissionCheck != PackageManager.PERMISSION_GRANTED && !writeExternalStoragePermissionDialogAnswered)
+					{
+						requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+					}
+				}
+			}
+		}
+		catch(Exception e) {}
 	}
 	
 	public void setUpStatusLabel()
@@ -345,10 +374,80 @@ public class MainActivity extends Activity
 		setContentView(_videoLayout);
 		mGLView = new DemoGLSurfaceView(this);
 		SetLayerType.get().setLayerType(mGLView);
-		_videoLayout.addView(mGLView);
+		// Add TV screen borders, if needed
+		if( isRunningOnOUYA() && Globals.TvBorders )
+		{
+			RelativeLayout view = new RelativeLayout(this);
+			RelativeLayout.LayoutParams layout;
+
+			/*
+			layout = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+			layout.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+			layout.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+			mGLView.setLayoutParams(layout);
+			view.addView(mGLView);
+			*/
+
+			layout = new RelativeLayout.LayoutParams(getResources().getDimensionPixelOffset(R.dimen.screen_border_horizontal), RelativeLayout.LayoutParams.MATCH_PARENT);
+			layout.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+			layout.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+			ImageView borderLeft = new ImageView(this);
+			borderLeft.setId(R.drawable.b1); // Any random ID
+			borderLeft.setImageResource(R.drawable.tv_border_left);
+			borderLeft.setScaleType(ImageView.ScaleType.FIT_XY);
+			view.addView(borderLeft, layout);
+
+			layout = new RelativeLayout.LayoutParams(getResources().getDimensionPixelOffset(R.dimen.screen_border_horizontal), RelativeLayout.LayoutParams.MATCH_PARENT);
+			layout.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+			layout.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+			ImageView borderRight = new ImageView(this);
+			borderRight.setId(R.drawable.b2);
+			borderRight.setImageResource(R.drawable.tv_border_left);
+			borderRight.setScaleType(ImageView.ScaleType.FIT_XY);
+			borderRight.setScaleX(-1f);
+			view.addView(borderRight, layout);
+
+			layout = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelOffset(R.dimen.screen_border_vertical));
+			layout.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+			layout.addRule(RelativeLayout.RIGHT_OF, borderLeft.getId());
+			layout.addRule(RelativeLayout.LEFT_OF, borderRight.getId());
+			ImageView borderTop = new ImageView(this);
+			borderTop.setId(R.drawable.b3);
+			borderTop.setImageResource(R.drawable.tv_border_top);
+			borderTop.setScaleType(ImageView.ScaleType.FIT_XY);
+			view.addView(borderTop, layout);
+
+			layout = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelOffset(R.dimen.screen_border_vertical));
+			layout.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+			layout.addRule(RelativeLayout.RIGHT_OF, borderLeft.getId());
+			layout.addRule(RelativeLayout.LEFT_OF, borderRight.getId());
+			ImageView borderBottom = new ImageView(this);
+			borderBottom.setId(R.drawable.b4);
+			borderBottom.setImageResource(R.drawable.tv_border_top);
+			borderBottom.setScaleType(ImageView.ScaleType.FIT_XY);
+			borderBottom.setScaleY(-1f);
+			view.addView(borderBottom, layout);
+
+			layout = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+			layout.addRule(RelativeLayout.RIGHT_OF, borderLeft.getId());
+			layout.addRule(RelativeLayout.LEFT_OF, borderRight.getId());
+			layout.addRule(RelativeLayout.BELOW, borderTop.getId());
+			layout.addRule(RelativeLayout.ABOVE, borderBottom.getId());
+			mGLView.setLayoutParams(layout);
+
+			view.addView(mGLView);
+
+			_videoLayout.addView(view, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+		}
+		else
+		{
+			_videoLayout.addView(mGLView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+		}
 		mGLView.setFocusableInTouchMode(true);
 		mGLView.setFocusable(true);
 		mGLView.requestFocus();
+
+
 		if( _ad.getView() != null )
 		{
 			_videoLayout.addView(_ad.getView());
@@ -430,6 +529,10 @@ public class MainActivity extends Activity
 		//if( _ad.getView() != null )
 		//	_ad.getView().onResume();
 		_isPaused = false;
+		// Nvidia is too smart to use Samsung's stylus API, obviously they need their own method to enable hover events
+		Intent i = new Intent("com.nvidia.intent.action.ENABLE_STYLUS");
+		i.putExtra("package", getPackageName());
+		sendBroadcast(i);
 	}
 
 	@Override
@@ -484,9 +587,15 @@ public class MainActivity extends Activity
 		cloudSave.onActivityResult(request, response, data);
 	}
 
-	private int TextInputKeyboardList[] = { 0, R.xml.qwerty, R.xml.c64, R.xml.amiga, R.xml.atari800 };
+	private int TextInputKeyboardList[][] =
+	{
+		{ 0, R.xml.qwerty, R.xml.c64, R.xml.amiga, R.xml.atari800 },
+		{ 0, R.xml.qwerty_shift, R.xml.c64, R.xml.amiga_shift, R.xml.atari800 },
+		{ 0, R.xml.qwerty_alt, R.xml.c64, R.xml.amiga_alt, R.xml.atari800 },
+		{ 0, R.xml.qwerty_alt_shift, R.xml.c64, R.xml.amiga_alt_shift, R.xml.atari800 }
+	};
 
-	public void showScreenKeyboardWithoutTextInputField()
+	public void showScreenKeyboardWithoutTextInputField(final int keyboard)
 	{
 		if( !keyboardWithoutTextInputShown )
 		{
@@ -495,7 +604,7 @@ public class MainActivity extends Activity
 			{
 				public void run()
 				{
-					if (Globals.TextInputKeyboard == 0)
+					if (keyboard == 0)
 					{
 						_inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 						_inputManager.showSoftInput(mGLView, InputMethodManager.SHOW_FORCED);
@@ -507,6 +616,9 @@ public class MainActivity extends Activity
 							return;
 						class BuiltInKeyboardView extends KeyboardView
 						{
+							public boolean shift = false;
+							public boolean alt = false;
+							public TreeSet<Integer> stickyKeys = new TreeSet<Integer>();
 							public BuiltInKeyboardView(Context context, android.util.AttributeSet attrs)
 							{
 								super(context, attrs);
@@ -523,35 +635,123 @@ public class MainActivity extends Activity
 								}
 								return false;
 							}
-							public boolean onKeyDown(int keyCode, final KeyEvent event)
+							public boolean onKeyDown(int key, final KeyEvent event)
 							{
-								if (keyCode == KeyEvent.KEYCODE_BACK)
-									return true;
 								return false;
 							}
-							public boolean onKeyUp(int keyCode, final KeyEvent event)
+							public boolean onKeyUp(int key, final KeyEvent event)
 							{
-								if (keyCode == KeyEvent.KEYCODE_BACK)
-								{
-									showScreenKeyboardWithoutTextInputField(); // Hide keyboard
-									return true;
-								}
 								return false;
+							}
+							public void ChangeKeyboard()
+							{
+								int idx = (shift ? 1 : 0) + (alt ? 2 : 0);
+								setKeyboard(new Keyboard(MainActivity.this, TextInputKeyboardList[idx][keyboard]));
+								setPreviewEnabled(false);
+								setProximityCorrectionEnabled(false);
+								for (Keyboard.Key k: getKeyboard().getKeys())
+								{
+									if (stickyKeys.contains(k.codes[0]))
+									{
+										k.on = true;
+										invalidateAllKeys();
+									}
+								}
 							}
 						}
-						BuiltInKeyboardView builtinKeyboard = new BuiltInKeyboardView(MainActivity.this, null);
-						builtinKeyboard.setKeyboard(new Keyboard(MainActivity.this, TextInputKeyboardList[Globals.TextInputKeyboard]));
-						builtinKeyboard.setPreviewEnabled(false);
-						builtinKeyboard.setProximityCorrectionEnabled(false);
+						final BuiltInKeyboardView builtinKeyboard = new BuiltInKeyboardView(MainActivity.this, null);
+						builtinKeyboard.setAlpha(0.7f);
+						builtinKeyboard.ChangeKeyboard();
 						builtinKeyboard.setOnKeyboardActionListener(new KeyboardView.OnKeyboardActionListener()
 						{
 							public void onPress(int key)
 							{
+								if (key == KeyEvent.KEYCODE_BACK)
+									return;
+								if (key < 0)
+									return;
+								for (Keyboard.Key k: builtinKeyboard.getKeyboard().getKeys())
+								{
+									if (k.sticky && key == k.codes[0])
+										return;
+								}
+								if (key > 100000)
+								{
+									key -= 100000;
+									MainActivity.this.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT));
+								}
 								MainActivity.this.onKeyDown(key, new KeyEvent(KeyEvent.ACTION_DOWN, key));
 							}
 							public void onRelease(int key)
 							{
+								if (key == KeyEvent.KEYCODE_BACK)
+								{
+									builtinKeyboard.setOnKeyboardActionListener(null);
+									showScreenKeyboardWithoutTextInputField(0); // Hide keyboard
+									return;
+								}
+								if (key == Keyboard.KEYCODE_SHIFT)
+								{
+									builtinKeyboard.shift = ! builtinKeyboard.shift;
+									if (builtinKeyboard.shift && !builtinKeyboard.alt)
+										MainActivity.this.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT));
+									else
+										MainActivity.this.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT));
+									builtinKeyboard.ChangeKeyboard();
+									return;
+								}
+								if (key == Keyboard.KEYCODE_ALT)
+								{
+									builtinKeyboard.alt = ! builtinKeyboard.alt;
+									if (builtinKeyboard.alt)
+										MainActivity.this.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT));
+									else
+										builtinKeyboard.shift = false;
+									builtinKeyboard.ChangeKeyboard();
+									return;
+								}
+								if (key < 0)
+									return;
+								for (Keyboard.Key k: builtinKeyboard.getKeyboard().getKeys())
+								{
+									if (k.sticky && key == k.codes[0])
+									{
+										if (k.on)
+										{
+											builtinKeyboard.stickyKeys.add(key);
+											MainActivity.this.onKeyDown(key, new KeyEvent(KeyEvent.ACTION_DOWN, key));
+										}
+										else
+										{
+											builtinKeyboard.stickyKeys.remove(key);
+											MainActivity.this.onKeyUp(key, new KeyEvent(KeyEvent.ACTION_UP, key));
+										}
+										return;
+									}
+								}
+
+								boolean shifted = false;
+								if (key > 100000)
+								{
+									key -= 100000;
+									shifted = true;
+								}
+
 								MainActivity.this.onKeyUp(key, new KeyEvent(KeyEvent.ACTION_UP, key));
+
+								if (shifted)
+								{
+									MainActivity.this.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT));
+									builtinKeyboard.stickyKeys.remove(KeyEvent.KEYCODE_SHIFT_LEFT);
+									for (Keyboard.Key k: builtinKeyboard.getKeyboard().getKeys())
+									{
+										if (k.sticky && k.codes[0] == KeyEvent.KEYCODE_SHIFT_LEFT && k.on)
+										{
+											k.on = false;
+											builtinKeyboard.invalidateAllKeys();
+										}
+									}
+								}
 							}
 							public void onText(CharSequence p1) {}
 							public void swipeLeft() {}
@@ -560,16 +760,6 @@ public class MainActivity extends Activity
 							public void swipeUp() {}
 							public void onKey(int p1, int[] p2) {}
 						});
-						/*
-						builtinKeyboard.addOnLayoutChangeListener(new View.OnLayoutChangeListener()
-						{
-							public void onLayoutChange (View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
-							{
-								Log.i("SDL", "Built-in keyboard getTop " + top);
-								((KeyboardView)v).setVerticalCorrection(top);
-							}
-						});
-						*/
 						_screenKeyboard = builtinKeyboard;
 						FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
 						_videoLayout.addView(_screenKeyboard, layout);
@@ -603,7 +793,7 @@ public class MainActivity extends Activity
 	{
 		if(Globals.CompatibilityHacksTextInputEmulatesHwKeyboard)
 		{
-			showScreenKeyboardWithoutTextInputField();
+			showScreenKeyboardWithoutTextInputField(Globals.TextInputKeyboard);
 			return;
 		}
 		if(_screenKeyboard != null)
@@ -630,7 +820,6 @@ public class MainActivity extends Activity
 					_parent.hideScreenKeyboard();
 					return true;
 				}
-				/*
 				if (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_CLEAR)
 				{
 					// EditText deletes two characters at a time, here's a hacky fix
@@ -640,12 +829,12 @@ public class MainActivity extends Activity
 						int start = t.getSelectionStart();  //get cursor starting position
 						int end = t.getSelectionEnd();      //get cursor ending position
 						if ( start < 0 )
-							return true;
+							return false;
 						if ( end < 0 || end == start )
 						{
 							start --;
 							if ( start < 0 )
-								return true;
+								return false;
 							end = start + 1;
 						}
 						t.setText(t.getText().toString().substring(0, start) + t.getText().toString().substring(end));
@@ -653,7 +842,6 @@ public class MainActivity extends Activity
 						return true;
 					}
 				}
-				*/
 				//Log.i("SDL", "Key " + keyCode + " flags " + event.getFlags() + " action " + event.getAction());
 				return false;
 			}
@@ -678,7 +866,7 @@ public class MainActivity extends Activity
 		screenKeyboard.setOnKeyListener(new simpleKeyListener(this));
 		screenKeyboard.setBackgroundColor(Color.BLACK); // Full opaque - do not show semi-transparent edit box, it's confusing
 		screenKeyboard.setTextColor(Color.WHITE); // Just to be sure about gamma
-		if( isRunningOnOUYA() )
+		if( isRunningOnOUYA() && Globals.TvBorders )
 			screenKeyboard.setPadding(100, 100, 100, 100); // Bad bad HDMI TVs all have cropped borders
 		_screenKeyboard = screenKeyboard;
 		_videoLayout.addView(_screenKeyboard);
@@ -715,7 +903,7 @@ public class MainActivity extends Activity
 	public void hideScreenKeyboard()
 	{
 		if( keyboardWithoutTextInputShown )
-			showScreenKeyboardWithoutTextInputField();
+			showScreenKeyboardWithoutTextInputField(Globals.TextInputKeyboard);
 
 		if(_screenKeyboard == null || ! (_screenKeyboard instanceof EditText))
 			return;
@@ -859,11 +1047,18 @@ public class MainActivity extends Activity
 	@Override
 	public boolean onKeyDown(int keyCode, final KeyEvent event)
 	{
-		if( keyCode == KeyEvent.KEYCODE_BACK && (event.getSource() & InputDevice.SOURCE_MOUSE)== InputDevice.SOURCE_MOUSE )
+		if( keyCode == KeyEvent.KEYCODE_BACK )
 		{
-			// Stupid Samsung and stupid Acer remaps right mouse button to BACK key
-			DemoGLSurfaceView.nativeMouseButtonsPressed(2, 1);
-			return true;
+			if( (event.getSource() & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE )
+			{
+				// Stupid Samsung and stupid Acer remaps right mouse button to BACK key
+				DemoGLSurfaceView.nativeMouseButtonsPressed(2, 1);
+				return true;
+			}
+			else if( keyboardWithoutTextInputShown )
+			{
+				return true;
+			}
 		}
 		if( _screenKeyboard != null && _screenKeyboard.onKeyDown(keyCode, event) )
 			return true;
@@ -887,11 +1082,19 @@ public class MainActivity extends Activity
 	@Override
 	public boolean onKeyUp(int keyCode, final KeyEvent event)
 	{
-		if( keyCode == KeyEvent.KEYCODE_BACK && (event.getSource() & InputDevice.SOURCE_MOUSE)== InputDevice.SOURCE_MOUSE )
+		if( keyCode == KeyEvent.KEYCODE_BACK )
 		{
-			// Stupid Samsung and stupid Acer remaps right mouse button to BACK key
-			DemoGLSurfaceView.nativeMouseButtonsPressed(2, 0);
-			return true;
+			if( (event.getSource() & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE )
+			{
+				// Stupid Samsung and stupid Acer remaps right mouse button to BACK key
+				DemoGLSurfaceView.nativeMouseButtonsPressed(2, 0);
+				return true;
+			}
+			else if( keyboardWithoutTextInputShown )
+			{
+				showScreenKeyboardWithoutTextInputField(0); // Hide keyboard
+				return true;
+			}
 		}
 		if( _screenKeyboard != null && _screenKeyboard.onKeyUp(keyCode, event) )
 			return true;
@@ -1046,20 +1249,28 @@ public class MainActivity extends Activity
 	{
 		try
 		{
-			if(Globals.NeedGles2)
+			if(Globals.NeedGles3)
+			{
+				System.loadLibrary("GLESv3");
+				Log.i("SDL", "libSDL: loaded GLESv3 lib");
+			}
+			else if(Globals.NeedGles2)
+			{
 				System.loadLibrary("GLESv2");
-			Log.i("SDL", "libSDL: loaded GLESv2 lib");
+				Log.i("SDL", "libSDL: loaded GLESv2 lib");
+			}
 		}
 		catch ( UnsatisfiedLinkError e )
 		{
-			Log.i("SDL", "libSDL: Cannot load GLESv2 lib");
+			Log.i("SDL", "libSDL: Cannot load GLESv3 or GLESv2 lib");
 		}
 
 		// Load all libraries
 		try
 		{
-			for(String l : Globals.AppLibraries)
+			for(String l_unmapped : Globals.AppLibraries)
 			{
+				String l = GetMappedLibraryName(l_unmapped);
 				try
 				{
 					String libname = System.mapLibraryName(l);
@@ -1159,8 +1370,9 @@ public class MainActivity extends Activity
 					out.close();
 				}
 
-				for(String l : Globals.AppLibraries)
+				for(String l_unmapped : Globals.AppLibraries)
 				{
+					String l = GetMappedLibraryName(l_unmapped);
 					String libname = System.mapLibraryName(l);
 					File libpath = new File(libDir, libname);
 					Log.i("SDL", "libSDL: loading lib " + libpath.getPath());
@@ -1175,7 +1387,7 @@ public class MainActivity extends Activity
 		}
 
 		String [] binaryZipNames = { "binaries-" + android.os.Build.CPU_ABI + ".zip", "binaries-" + android.os.Build.CPU_ABI2 + ".zip", "binaries.zip" };
-		if ( android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP )
+		if ( android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN )
 			binaryZipNames = new String[] { "binaries-" + android.os.Build.CPU_ABI + "-pie.zip", "binaries-" + android.os.Build.CPU_ABI2 + "-pie.zip", "binaries-" + android.os.Build.CPU_ABI + ".zip", "binaries-" + android.os.Build.CPU_ABI2 + ".zip", "binaries.zip" };
 		for(String binaryZip: binaryZipNames)
 		{
@@ -1284,10 +1496,20 @@ public class MainActivity extends Activity
 		}
 	};
 
+	public static String GetMappedLibraryName(final String s)
+	{
+		for (int i = 0; i < Globals.LibraryNamesMap.length; i++)
+		{
+			if( Globals.LibraryNamesMap[i][0].equals(s) )
+				return Globals.LibraryNamesMap[i][1];
+		}
+		return s;
+	}
+
 	public static void LoadApplicationLibrary(final Context context)
 	{
 		Settings.nativeChdir(Globals.DataDir);
-		for(String l : Globals.AppMainLibraries)
+		for(String l: Globals.AppMainLibraries)
 		{
 			try
 			{
@@ -1335,7 +1557,8 @@ public class MainActivity extends Activity
 			return true;
 		} catch (PackageManager.NameNotFoundException e) {
 		}
-		return Globals.OuyaEmulation;
+		UiModeManager uiModeManager = (UiModeManager) getSystemService(UI_MODE_SERVICE);
+		return (uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION) || Globals.OuyaEmulation;
 	}
 
 	public boolean isCurrentOrientationHorizontal()
@@ -1370,6 +1593,25 @@ public class MainActivity extends Activity
 			setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 		else
 			setRequestedOrientation(Globals.HorizontalOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+	{
+		if (permissions.length == 0 || grantResults.length == 0)
+		{
+			Log.i("SDL", "libSDL: Permission request dialog was aborted");
+			return;
+		}
+		if (Manifest.permission.RECORD_AUDIO.equals(permissions[0]))
+		{
+			Log.i("SDL", "libSDL: Record audio permission: " + (grantResults[0] == PackageManager.PERMISSION_GRANTED ? "GRANTED" : "DENIED"));
+		}
+		if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permissions[0]))
+		{
+			Log.i("SDL", "libSDL: Write external storage permission: " + (grantResults[0] == PackageManager.PERMISSION_GRANTED ? "GRANTED" : "DENIED"));
+			writeExternalStoragePermissionDialogAnswered = true;
+		}
 	}
 
 	public FrameLayout getVideoLayout() { return _videoLayout; }
@@ -1410,6 +1652,7 @@ public class MainActivity extends Activity
 
 	public LinkedList<Integer> textInput = new LinkedList<Integer> ();
 	public static MainActivity instance = null;
+	public boolean writeExternalStoragePermissionDialogAnswered = false;
 }
 
 // *** HONEYCOMB / ICS FIX FOR FULLSCREEN MODE, by lmak ***
@@ -1483,27 +1726,5 @@ abstract class SetLayerType
 		public void setLayerType(final View view)
 		{
 		}
-	}
-}
-
-class DummyService extends Service
-{
-	public DummyService()
-	{
-		super();
-	}
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId)
-	{
-		return Service.START_STICKY;
-	}
-	@Override
-	public void onDestroy()
-	{
-	}
-	@Override
-	public IBinder onBind(Intent intent)
-	{
-		return null;
 	}
 }
