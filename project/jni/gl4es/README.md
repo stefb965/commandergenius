@@ -3,11 +3,11 @@ gl4es
 
 This is a library providing OpenGL 1.x functionality for OpenGL ES accelerated hardware.
 
-This is a fork a glshim (https://github.com/lunixbochs/glshim). Go check this lib if you need things like RemoteGL or if need support for TinyGLES (for 100% software rendering).
+This is a fork a glshim (https://github.com/lunixbochs/glshim). Go check this lib if you need things like RemoteGL or TinyGLES (for 100% software rendering).
 
-The focusse is on compatibility with a wide selection of game and software, as well as speed.
+The focus is on compatibility with a wide selection of game and software, as well as speed.
 
-It has been tested successfully of a large selection of games and software, including: Mincraft, OpenMW, SeriousSam, RVGL, TSMC, TORCS, SpeedDreams, GL-117, Blender 2.68 and many more.
+It has been tested successfully of a large selection of games and software, including: Minecraft, OpenMW, SeriousSam (both First and Second Encounters), RVGL (ReVolt GL), TSMC (The Secret Maryo Chronicles), TORCS, SpeedDreams, GL-117, Foobillard(plus), Blender 2.68 to name just a few.
 
 Most function of OpenGL up to 1.5 are supported, with some notable exceptions:
  * Reading of Depth or Stencil buffer will not work
@@ -135,7 +135,7 @@ Experimental: enable Alpha test only when using texture that contains an alpha c
  * 1 : Alpha Hack enabled
 
 ##### LIBGL_NODOWNSAMPLING
-Texture downsampling control
+Texture downsampling control (deprecated, use LIBGL_AVOID16BITS instead)
  * 0 : Default, DXTc texture are downsampled to 16bits
  * 1 : DXTc texture are left as 32bits RGBA
 
@@ -235,13 +235,35 @@ Vertex Array BGRA extension
  * 0 : Default, GL_ARB_vertex_array_bgra not exposed (still emulated)
  * 1 : Extension exposed may be faster in some cases (Arx Libertatis mainly)
 
+##### LIBGL_BEGINEND
+Merge of subsequent glBegin/glEnd blocks (will be non-effective if BATCH mode is used)
+ * 0 : Don't try to merge
+ * 1 : Try to merge, even if there is a glColor / glNormal in between (default)
+ * 2 : Try hard to merge, even if there is a glColor / glNormal or Matrix operations in between
+
+##### LIBGL_AVOID16BITS
+Try to avoid 16bits textures
+ * 0 : Default, use 16bits texture if it can avoid a convertion or for DXTc textures
+ * 1 : Use 32bits texture unless specifically requested (using internalformat)
+
 ----
 
 Version history
 ----
-
 ##### Current version
- * Added some optimisations for sequencial glBegin/glEnd blocks
+ * Some fix with the PixMap glX context creation
+ 
+##### 0.9.6
+ * Some fixes in GL_TEXTURE_RECTANGLE_ARB handling
+ * Some other fixes in texture handling (unpack and glList related)
+ * Some fix with the PBuffer glX context creation
+ * Tracking of glFog
+ * Exposed glBlendEquation if supported
+ * New LIBGL_AVOID16BITS parameter to prefer 32bits texture (usefull on ODroid)
+ * Some optimisations in texture conversion
+
+##### 0.9.5
+ * Added some optimisations for sequencial glBegin/glEnd blocks, with a switch to control them
  * Fixed many issue with Lights introduced with 0.9.4
  * Fixed Android build introduced with 0.9.4
 

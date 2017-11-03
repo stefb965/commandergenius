@@ -392,7 +392,7 @@ public class MainActivity extends Activity
 			layout.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
 			layout.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
 			ImageView borderLeft = new ImageView(this);
-			borderLeft.setId(R.drawable.b1); // Any random ID
+			borderLeft.setId(R.id.left); // Any random ID
 			borderLeft.setImageResource(R.drawable.tv_border_left);
 			borderLeft.setScaleType(ImageView.ScaleType.FIT_XY);
 			view.addView(borderLeft, layout);
@@ -401,7 +401,7 @@ public class MainActivity extends Activity
 			layout.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
 			layout.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
 			ImageView borderRight = new ImageView(this);
-			borderRight.setId(R.drawable.b2);
+			borderRight.setId(R.id.right);
 			borderRight.setImageResource(R.drawable.tv_border_left);
 			borderRight.setScaleType(ImageView.ScaleType.FIT_XY);
 			borderRight.setScaleX(-1f);
@@ -412,7 +412,7 @@ public class MainActivity extends Activity
 			layout.addRule(RelativeLayout.RIGHT_OF, borderLeft.getId());
 			layout.addRule(RelativeLayout.LEFT_OF, borderRight.getId());
 			ImageView borderTop = new ImageView(this);
-			borderTop.setId(R.drawable.b3);
+			borderTop.setId(R.id.top);
 			borderTop.setImageResource(R.drawable.tv_border_top);
 			borderTop.setScaleType(ImageView.ScaleType.FIT_XY);
 			view.addView(borderTop, layout);
@@ -422,7 +422,7 @@ public class MainActivity extends Activity
 			layout.addRule(RelativeLayout.RIGHT_OF, borderLeft.getId());
 			layout.addRule(RelativeLayout.LEFT_OF, borderRight.getId());
 			ImageView borderBottom = new ImageView(this);
-			borderBottom.setId(R.drawable.b4);
+			borderBottom.setId(R.id.bottom);
 			borderBottom.setImageResource(R.drawable.tv_border_top);
 			borderBottom.setScaleType(ImageView.ScaleType.FIT_XY);
 			borderBottom.setScaleY(-1f);
@@ -446,7 +446,10 @@ public class MainActivity extends Activity
 		mGLView.setFocusableInTouchMode(true);
 		mGLView.setFocusable(true);
 		mGLView.requestFocus();
-
+		if (Globals.HideSystemMousePointer && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+		{
+			mGLView.setPointerIcon(android.view.PointerIcon.getSystemIcon(this, android.view.PointerIcon.TYPE_NULL));
+		}
 
 		if( _ad.getView() != null )
 		{
@@ -864,8 +867,8 @@ public class MainActivity extends Activity
 		screenKeyboard.setText(oldText);
 		screenKeyboard.setSelection(screenKeyboard.getText().length());
 		screenKeyboard.setOnKeyListener(new simpleKeyListener(this));
-		screenKeyboard.setBackgroundColor(Color.BLACK); // Full opaque - do not show semi-transparent edit box, it's confusing
-		screenKeyboard.setTextColor(Color.WHITE); // Just to be sure about gamma
+		screenKeyboard.setBackgroundColor(this.getResources().getColor(android.R.color.primary_text_light));
+		screenKeyboard.setTextColor(this.getResources().getColor(android.R.color.background_light));
 		if( isRunningOnOUYA() && Globals.TvBorders )
 			screenKeyboard.setPadding(100, 100, 100, 100); // Bad bad HDMI TVs all have cropped borders
 		_screenKeyboard = screenKeyboard;
@@ -874,9 +877,8 @@ public class MainActivity extends Activity
 		screenKeyboard.setInputType(InputType.TYPE_CLASS_TEXT);
 		screenKeyboard.setFocusableInTouchMode(true);
 		screenKeyboard.setFocusable(true);
-		screenKeyboard.requestFocus();
-		_inputManager.showSoftInput(screenKeyboard, InputMethodManager.SHOW_IMPLICIT);
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		//_inputManager.showSoftInput(screenKeyboard, InputMethodManager.SHOW_IMPLICIT);
+		//getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 		// Hack to try to force on-screen keyboard
 		final EditText keyboard = screenKeyboard;
 		keyboard.postDelayed( new Runnable()
@@ -884,8 +886,7 @@ public class MainActivity extends Activity
 				public void run()
 				{
 					keyboard.requestFocus();
-					//_inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-					_inputManager.showSoftInput(keyboard, InputMethodManager.SHOW_FORCED);
+					//_inputManager.showSoftInput(keyboard, InputMethodManager.SHOW_FORCED);
 					// Hack from Stackoverflow, to force text input on Ouya
 					keyboard.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN , 0, 0, 0));
 					keyboard.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP , 0, 0, 0));
@@ -893,11 +894,12 @@ public class MainActivity extends Activity
 					{
 						public void run()
 						{
+							keyboard.requestFocus();
 							keyboard.setSelection(keyboard.getText().length());
 						}
 					}, 100 );
 				}
-			}, 500 );
+			}, 300 );
 	};
 
 	public void hideScreenKeyboard()
@@ -1613,6 +1615,13 @@ public class MainActivity extends Activity
 			writeExternalStoragePermissionDialogAnswered = true;
 		}
 	}
+
+    public void setSystemMousePointerVisible(int visible) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+		{
+			mGLView.setPointerIcon(android.view.PointerIcon.getSystemIcon(this, (visible == 0) ? android.view.PointerIcon.TYPE_NULL : android.view.PointerIcon.TYPE_DEFAULT));
+		}
+    }
 
 	public FrameLayout getVideoLayout() { return _videoLayout; }
 

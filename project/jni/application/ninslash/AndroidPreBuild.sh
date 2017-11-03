@@ -20,15 +20,13 @@ python datasrc/compile.py server_content_header > src/game/generated/server_data
 python scripts/cmd5.py src/engine/shared/protocol.h src/game/generated/protocol.h src/game/tuning.h src/game/gamecore.cpp src/game/generated/protocol.h > src/game/generated/nethash.cpp
 }
 
-
 echo "Archiving data"
 mkdir -p ../AndroidData
 ln -sf ../src/logo.png ../AndroidData
 rm -f ../AndroidData/data.zip
-zip -r ../AndroidData/data.zip data *.txt *.cfg "example configs" >/dev/null
+zip -r ../AndroidData/data.zip data *.txt *.cfg "example configs" cfg >/dev/null
 
-
-for ARCH in armeabi-v7a x86; do
+for ARCH in armeabi-v7a x86 arm64-v8a; do
 	[ -e ../AndroidData/binaries-$ARCH.zip ] && \
 		find `cat ../server-sources.txt` -cnewer ../AndroidData/binaries-$ARCH.zip | \
 		[ `wc -c` -eq 0 ] && continue

@@ -319,6 +319,9 @@ echo >> AndroidAppSettings.cfg
 echo "# Immersive mode - Android will hide on-screen Home/Back keys. Looks bad if you invoke Android keyboard. (y) / (n)" >> AndroidAppSettings.cfg
 echo ImmersiveMode=$ImmersiveMode >> AndroidAppSettings.cfg
 echo >> AndroidAppSettings.cfg
+echo "# Hide Android system mouse cursor image when USB mouse is attached (y) or (n) - the app must draw it's own mouse cursor" >> AndroidAppSettings.cfg
+echo HideSystemMousePointer=$HideSystemMousePointer >> AndroidAppSettings.cfg
+echo >> AndroidAppSettings.cfg
 echo "# Application implements Android-specific routines to put to background, and will not draw anything to screen" >> AndroidAppSettings.cfg
 echo "# between SDL_ACTIVEEVENT lost / gained notifications - you should check for them" >> AndroidAppSettings.cfg
 echo "# rigth after SDL_Flip(), if (n) then SDL_Flip() will block till app in background (y) or (n)" >> AndroidAppSettings.cfg
@@ -431,6 +434,9 @@ echo AdmobBannerSize=$AdmobBannerSize >> AndroidAppSettings.cfg
 echo >> AndroidAppSettings.cfg
 echo "# Google Play Game Services application ID, required for cloud saves to work" >> AndroidAppSettings.cfg
 echo GooglePlayGameServicesId=$GooglePlayGameServicesId >> AndroidAppSettings.cfg
+echo >> AndroidAppSettings.cfg
+echo "# The app will open files with following extension, file path will be added to commandline params" >> AndroidAppSettings.cfg
+echo AppOpenFileExtension=\'$AppOpenFileExtension\' >> AndroidAppSettings.cfg
 echo >> AndroidAppSettings.cfg
 fi
 
@@ -807,6 +813,10 @@ else
 	cat $F | sed "s/^package .*;/package $AppFullName;/" >> project/src/Advertisement.java
 fi
 
+cat project/app/build-template.gradle | \
+	sed 's/applicationId .*/applicationId "'"$AppFullName"'"/' > \
+	project/app/build.gradle
+
 echo "-keep class $AppFullName.** { *; }" > project/proguard-local.cfg
 
 if [ "$AppRecordsAudio" = "n" -o -z "$AppRecordsAudio" ] ; then
@@ -838,10 +848,23 @@ if [ "$AccessInternet" = "n" ]; then
 	$SEDI "/==INTERNET==/ d" project/AndroidManifest.xml
 fi
 
+if [ -z "$AppOpenFileExtension" ]; then
+	$SEDI "/==OPENFILE==/ d" project/AndroidManifest.xml
+else
+	EXTS="`for EXT in $AppOpenFileExtension; do echo -n '\\\\1'$EXT'\\\\2' ; done`"
+	$SEDI "s/\(.*\)==OPENFILE-EXT==\(.*\)/$EXTS/g" project/AndroidManifest.xml
+fi
+
 if [ "$ImmersiveMode" = "n" ]; then
 	ImmersiveMode=false
 else
 	ImmersiveMode=true
+fi
+
+if [ "$HideSystemMousePointer" = "y" ]; then
+	HideSystemMousePointer=true
+else
+	HideSystemMousePointer=false
 fi
 
 GLESLib=-lGLESv1_CM
@@ -913,6 +936,7 @@ $SEDI "s/public static boolean AppUsesMultitouch = .*;/public static boolean App
 $SEDI "s/public static boolean NonBlockingSwapBuffers = .*;/public static boolean NonBlockingSwapBuffers = $NonBlockingSwapBuffers;/" project/src/Globals.java
 $SEDI "s/public static boolean ResetSdlConfigForThisVersion = .*;/public static boolean ResetSdlConfigForThisVersion = $ResetSdlConfigForThisVersion;/" project/src/Globals.java
 $SEDI "s/public static boolean ImmersiveMode = .*;/public static boolean ImmersiveMode = $ImmersiveMode;/" project/src/Globals.java
+$SEDI "s/public static boolean HideSystemMousePointer = .*;/public static boolean HideSystemMousePointer = $HideSystemMousePointer;/" project/src/Globals.java
 $SEDI "s|public static String DeleteFilesOnUpgrade = .*;|public static String DeleteFilesOnUpgrade = \"$DeleteFilesOnUpgrade\";|" project/src/Globals.java
 $SEDI "s/public static int AppTouchscreenKeyboardKeysAmount = .*;/public static int AppTouchscreenKeyboardKeysAmount = $AppTouchscreenKeyboardKeysAmount;/" project/src/Globals.java
 $SEDI "s@public static String\\[\\] AppTouchscreenKeyboardKeysNames = .*;@public static String[] AppTouchscreenKeyboardKeysNames = \"$RedefinedKeysScreenKbNames\".split(\" \");@" project/src/Globals.java
@@ -978,15 +1002,15 @@ done
 cd ../../..
 
 SDK_DIR=`grep '^sdk.dir' project/local.properties | sed 's/.*=//'`
+[ -z "$SDK_DIR" ] && SDK_DIR=`which android | sed 's@/tools/android$@@'`
 mkdir -p project/libs
+echo "sdk.dir=$SDK_DIR" > project/local.properties
+echo 'proguard.config=proguard.cfg;proguard-local.cfg' >> project/local.properties
 
 if [ "$GooglePlayGameServicesId" = "n" -o -z "$GooglePlayGameServicesId" ] ; then
 	$SEDI "/==GOOGLEPLAYGAMESERVICES==/ d" project/AndroidManifest.xml
+	$SEDI "/==GOOGLEPLAYGAMESERVICES==/ d" project/app/build.gradle
 	GooglePlayGameServicesId=""
-	grep '=play-services' project/local.properties > /dev/null && {
-		$SEDI 's/.*=play-services.*//g' project/local.properties
-		rm -f project/libs/android-support-v4.jar
-	}
 else
 	for F in $JAVA_SRC_PATH/googleplaygameservices/*.java; do
 		OUT=`echo $F | sed 's@.*/@@'` # basename tool is not available everywhere
@@ -995,46 +1019,16 @@ else
 		cat $F | sed "s/^package .*;/package $AppFullName;/" >> project/src/$OUT
 	done
 
-	PLAY_SERVICES_VER=9.4.0
-	rm -rf project/play-services
-
-	CURDIR=`pwd`
-	cd $SDK_DIR/extras/google/m2repository/com/google/android/gms/play-services-games/$PLAY_SERVICES_VER       || exit 1
-	$CURDIR/aar2jar.py -o $CURDIR/project/play-services/games     -i play-services-games-$PLAY_SERVICES_VER    || exit 1
-	cd $SDK_DIR/extras/google/m2repository/com/google/android/gms/play-services-drive/$PLAY_SERVICES_VER       || exit 1
-	$CURDIR/aar2jar.py -o $CURDIR/project/play-services/drive     -i play-services-drive-$PLAY_SERVICES_VER    || exit 1
-	cd $SDK_DIR/extras/google/m2repository/com/google/android/gms/play-services-base/$PLAY_SERVICES_VER        || exit 1
-	$CURDIR/aar2jar.py -o $CURDIR/project/play-services/base      -i play-services-base-$PLAY_SERVICES_VER     || exit 1
-	cd $SDK_DIR/extras/google/m2repository/com/google/android/gms/play-services-tasks/$PLAY_SERVICES_VER       || exit 1
-	$CURDIR/aar2jar.py -o $CURDIR/project/play-services/tasks     -i play-services-tasks-$PLAY_SERVICES_VER    || exit 1
-	cd $SDK_DIR/extras/google/m2repository/com/google/android/gms/play-services-basement/$PLAY_SERVICES_VER    || exit 1
-	$CURDIR/aar2jar.py -o $CURDIR/project/play-services/basement  -i play-services-basement-$PLAY_SERVICES_VER || exit 1
-	cd $CURDIR
-
 	$SEDI "s/==GOOGLEPLAYGAMESERVICES_APP_ID==/$GooglePlayGameServicesId/g" project/res/values/strings.xml
-	grep 'play-services' project/local.properties > /dev/null || {
 
-		PROGUARD=`which android`
-		PROGUARD=`dirname $PROGUARD`/proguard/lib/proguard.jar
-		java -jar $PROGUARD | grep 'ProGuard, version 5.3.2' || {
-			echo "Error: ProGuard is too old"
-			echo "You need to update ProGuard. Download it here:"
-			echo "https://sourceforge.net/projects/proguard/files/proguard/5.3/proguard5.3.2.tar.gz"
-			echo "Unpack it, then place file proguard.jar to $PROGUARD"
-			exit 1
-		}
-
-		# Ant is way too smart, and adds current project path in front of the ${sdk.dir}
-		echo "android.library.reference.1=play-services/games/play-services-games-$PLAY_SERVICES_VER" >> project/local.properties
-		echo "android.library.reference.2=play-services/drive/play-services-drive-$PLAY_SERVICES_VER" >> project/local.properties
-		echo "android.library.reference.3=play-services/base/play-services-base-$PLAY_SERVICES_VER" >> project/local.properties
-		echo "android.library.reference.4=play-services/tasks/play-services-tasks-$PLAY_SERVICES_VER" >> project/local.properties
-		echo "android.library.reference.5=play-services/basement/play-services-basement-$PLAY_SERVICES_VER" >> project/local.properties
-		#echo 'android.library.reference.6=../../../../../../../../../../../../../../${sdk.dir}/extras/android/compatibility/v7/mediarouter' >> project/local.properties
-		#echo 'android.library.reference.7=../../../../../../../../../../../../../../${sdk.dir}/extras/android/compatibility/v7/appcompat' >> project/local.properties
-		#echo 'android.library.reference.8=../../../../../../../../../../../../../../${sdk.dir}/extras/android/compatibility/v7/palette' >> project/local.properties
-		echo 'proguard.config=proguard.cfg;proguard-local.cfg' >> project/local.properties
-		ln -s -f $SDK_DIR/extras/android/compatibility/v4/android-support-v4.jar project/libs
+	PROGUARD=`which android`
+	PROGUARD=`dirname $PROGUARD`/proguard/lib/proguard.jar
+	java -jar $PROGUARD | grep 'ProGuard, version 5.3' || {
+		echo "Error: ProGuard is too old"
+		echo "You need to update ProGuard. Download it here:"
+		echo "https://sourceforge.net/projects/proguard/files/proguard/5.3/proguard5.3.3.zip"
+		echo "Unpack it, then place file proguard.jar to $PROGUARD"
+		exit 1
 	}
 fi
 
@@ -1065,6 +1059,7 @@ done
 done
 rm -rf project/bin/classes
 rm -rf project/bin/res
+rm -rf project/app/build
 
 # Generate OUYA icon, for that one user who still got an OUYA in his living room and won't throw it away just because someone else decides that it's dead
 rm -rf project/res/drawable-xhdpi/ouya_icon.png

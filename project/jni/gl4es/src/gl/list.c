@@ -500,7 +500,7 @@ renderlist_t* append_calllist(renderlist_t *list, renderlist_t *a)
                 a->shared_indices = (int*)malloc(sizeof(int));
                 *a->shared_indices = 0;
             }
-            if(a->calls.cap && !a->shared_calls) {
+            if(a->calls.len && !a->shared_calls) {
                 a->shared_calls = (int*)malloc(sizeof(int));
                 *a->shared_calls = 0;
             }
@@ -523,7 +523,7 @@ renderlist_t* append_calllist(renderlist_t *list, renderlist_t *a)
                     }
                 }
             }
-            if (list->calls.cap > 0) {
+            if (list->calls.len > 0) {
                 ++(*list->shared_calls);
                 /*
                 list->calls.calls = (packed_call_t**)malloc(sizeof(packed_call_t*)*a->calls.cap);
@@ -548,7 +548,6 @@ renderlist_t* append_calllist(renderlist_t *list, renderlist_t *a)
             if(list->len) {
                 ++(*list->shared_arrays);
             }
-            #undef PROCESS
             if(list->ilen) {
                 ++(*list->shared_indices);
             }
@@ -603,7 +602,7 @@ void free_renderlist(renderlist_t *list) {
 
     renderlist_t *next;
     do {
-        if ((list->calls.cap > 0) && (!list->shared_calls || ((*list->shared_calls)--)==0)) {
+        if ((list->calls.len > 0) && (!list->shared_calls || ((*list->shared_calls)--)==0)) {
             if(list->shared_calls) free(list->shared_calls);
             for (int i = 0; i < list->calls.len; i++) {
                 free(list->calls.calls[i]);
@@ -971,11 +970,11 @@ void draw_renderlist(renderlist_t *list) {
         static GLfloat *texgened[MAX_TEX] = {0};
         static int texgenedsz[MAX_TEX] = {0};
         int use_texgen[MAX_TEX] = {0};
-        #define TEXTURE(A) if (cur_tex!=A) {gl4es_glClientActiveTexture(A+GL_TEXTURE0); cur_tex=A;}
         old_tex = glstate->texture.client;
         GLuint cur_tex = old_tex;
-        #define RS(A, len) if(texgenedsz[A]<len) {free(texgened[A]); texgened[A]=malloc(4*sizeof(GLfloat)*len); texgenedsz[A]=len; } use_texgen[A]=1
         GLint needclean[MAX_TEX] = {0};
+        #define TEXTURE(A) if (cur_tex!=A) {gl4es_glClientActiveTexture(A+GL_TEXTURE0); cur_tex=A;}
+        #define RS(A, len) if(texgenedsz[A]<len) {free(texgened[A]); texgened[A]=malloc(4*sizeof(GLfloat)*len); texgenedsz[A]=len; } use_texgen[A]=1
         for (int a=0; a<hardext.maxtex; a++) {
             if(glstate->enable.texture[a]) {
                 const GLint itarget = get_target(glstate->enable.texture[a]);
@@ -1003,9 +1002,6 @@ void draw_renderlist(renderlist_t *list) {
                     }
                 }
             }
-        }
-        #undef RS
-        for (int a=0; a<hardext.maxtex; a++) {
 		    if ((list->tex[a] || (use_texgen[a] && !needclean[a]))/* && glstate->enable.texture[a]*/) {
                 TEXTURE(a);
                 if(!glstate->clientstate.tex_coord_array[a]) {
@@ -1028,7 +1024,8 @@ void draw_renderlist(renderlist_t *list) {
             }
         }
         if (glstate->texture.client != old_tex) TEXTURE(old_tex);
-    #undef TEXTURE
+        #undef RS
+        #undef TEXTURE
         GLenum mode;
         mode = list->mode;
         if ((glstate->polygon_mode == GL_LINE) && (mode>=GL_TRIANGLES))
@@ -1281,6 +1278,9 @@ void FASTMATH rlVertex4f(renderlist_t *list, GLfloat x, GLfloat y, GLfloat z, GL
 
     GLfloat * const vert = list->vert + (list->len++ * 4);
     vert[0] = x; vert[1] = y; vert[2] = z; vert[3] = w;
+    if(glstate->immediateMV) { // need to trasform the vector if immediateMV is active
+        vector_matrix(vert, getMVMat(), vert);
+    }
 }
 
 void rlNormal3f(renderlist_t *list, GLfloat x, GLfloat y, GLfloat z) {
@@ -1296,6 +1296,9 @@ void rlNormal3f(renderlist_t *list, GLfloat x, GLfloat y, GLfloat z) {
     
     GLfloat *normal = list->lastNormal;
     normal[0] = x; normal[1] = y; normal[2] = z;
+    if(glstate->immediateMV) { // need to trasform the vector if immediateMV is active
+        vector3_matrix(normal, getMVMat(), normal);
+    }
 }
 
 void rlColor4f(renderlist_t *list, GLfloat r, GLfloat g, GLfloat b, GLfloat a) {

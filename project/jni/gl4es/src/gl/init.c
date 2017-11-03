@@ -45,6 +45,7 @@ void initialize_gl4es() {
     memset(&globals4es, 0, sizeof(globals4es));
     globals4es.mergelist = 1;
     globals4es.queries = 1;
+    globals4es.beginend = 1;
     // overides by env. variables
     char *env_nobanner = getenv("LIBGL_NOBANNER");
     if (env_nobanner && strcmp(env_nobanner, "1") == 0)
@@ -85,14 +86,14 @@ void initialize_gl4es() {
     }
     if (env_fb && strcmp(env_fb, "2") == 0) {
             SHUT(LOGD("LIBGL: using framebuffer + fbo\n"));
-            globals4es.usefb = true;
-            globals4es.usefbo = true;
+            globals4es.usefb = 1;
+            globals4es.usefbo = 1;
     }
 #ifndef ANDROID
     if (env_fb && strcmp(env_fb, "3") == 0) {
             SHUT(LOGD("LIBGL: using pbuffer\n"));
             globals4es.usefb = 1;
-            globals4es.usepbuffer = true;
+            globals4es.usepbuffer = 1;
     }
 #endif
     env(LIBGL_FPS, globals4es.showfps, "fps counter enabled");
@@ -266,7 +267,24 @@ void initialize_gl4es() {
 
     env(LIBGL_NOTEXMAT, globals4es.texmat, "Don't handle Texture Matrice internaly");
     env(LIBGL_NOVAOCACHE, globals4es.novaocache, "Don't use VAO cache");
-     
+    
+    char *env_beginend = getenv("LIBGL_BEGINEND");
+    if(env_beginend) {
+        if (strcmp(env_beginend, "0") == 0) {
+                globals4es.beginend = 0;
+                SHUT(LOGD("LIBGL: Don't try to merge subsequent glBegin/glEnd blocks\n"));
+        } 
+        if (strcmp(env_beginend, "1") == 0) {
+                globals4es.beginend = 1;
+                SHUT(LOGD("LIBGL: Try to merge subsequent glBegin/glEnd blocks, even if there is a glColor / glNormal in between\n"));
+        } 
+        if (strcmp(env_beginend, "2") == 0) {
+                globals4es.beginend = 2;
+                SHUT(LOGD("LIBGL: Try hard to merge subsequent glBegin/glEnd blocks, even if there is a glColor / glNormal or Matrix operations in between\n"));
+        } 
+    }
+    env(LIBGL_AVOID16BITS, globals4es.avoid16bits, "Avoid 16bits textures");
+
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd))!= NULL)
         SHUT(LOGD("LIBGL: Current folder is:%s\n", cwd));

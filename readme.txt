@@ -11,8 +11,8 @@ Installation
 ============
 
 Install latest Android SDK and NDK from http://developer.android.com/index.html
-Add both to your PATH env variable 0 you sohuld be albe to run commands 'ndk-build' and 'android'.
-You will need to install Java Ant too.
+Add both to your PATH env variable 0 you should be able to run commands 'ndk-build' and 'android'.
+You will need to install Gradle also.
 it is recommended to install OpenJDK and its development files.
 On RPM based distros they are usually called java-x.x.x-openjdk and java-x.x.x-openjdk-devel.
 On Debian or Ubuntu you install them like this: sudo apt-get install openjdk-8-jdk ant
@@ -29,10 +29,11 @@ How to compile demo application
 ===============================
 
 Launch commands
+
 	rm project/jni/application/src
 	ln -s ballfield project/jni/application/src
 	./changeAppSettings.sh -a
-	android update project -p project
+	
 Then edit file build.sh if needed to add NDK dir to your PATH, then launch it.
 It will compile a bunch of libs under project/libs/armeabi,
 create Android package file project/bin/MainActivity-debug.apk,
@@ -58,6 +59,28 @@ This port also supports GL ES + SDL combo - there is GLXGears demo app in projec
 to compile it remove project/jni/application/src symlink and make new one pointing to glxgears, and run build.sh
 Note that GL ES is NOT pure OpenGL - there are no glBegin() and glEnd() call and other widely used functions,
 and generally it will take a lot of effort to port OpenGL application to GL ES.
+
+
+Licensing issues when using gradle 
+==================================
+
+cd into android-sdk-linux/tools/bin
+
+
+and
+
+./sdkmanager --licenses
+
+if that does not work you need to update
+
+./sdkmanager --update
+
+Accept the license with 'y'. It might download additional stuff, yet not sure, why...
+
+Retry with 
+
+./sdkmanager --licenses
+
 
 How to compile a specific SDL based application
 ===============================================
@@ -231,16 +254,6 @@ memcpy( &i, p, sizeof(int) ); // The correct way to dereference a non-aligned po
 This compiler flags will catch most obvious errors, you may add them to AppCflags var in settings:
 -Wstrict-aliasing -Wcast-align -Wpointer-arith -Waddress
 Also beware of the NDK - some system headers contain the code that triggers that warnings.
-
-The application will automatically get moved to SD-card on Android 2.2 or newer,
-(or you can install app2sd for older, but rooted phones),
-however the shared libraries have to be stored on the device internal storage,
-and that may be not desired for older phones with very little storage.
-The script app2sd.sh will re-package your .apk file in such a way that
-the shared libraries will not be extracted by Android OS but by application itself,
-and it will remove them from internal storage right after starting up,
-so you still need that space free, but only temporarily.
-However your application will start up slower.
 
 SDL supports AdMob advertisements, you need to set your publisher ID inside AndroidAppSettings.cfg,
 see project test-advertisements for details.
