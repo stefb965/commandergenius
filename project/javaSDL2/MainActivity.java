@@ -38,7 +38,8 @@ import android.content.pm.PackageManager;
 /**
     SDL Activity
 */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity
+{
 
 
     private static final String TAG = "SDL";
@@ -81,25 +82,28 @@ public class MainActivity extends Activity {
      };
 
 
-     private boolean checkPermissions() {
-        int result;
-        List<String> listPermissionsNeeded = new ArrayList<>();
-        for (String p : permissions) {
-            result = checkSelfPermission(p);
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                listPermissionsNeeded.add(p);
-            }
-        }
-        if (!listPermissionsNeeded.isEmpty()) {
-            requestPermissions(listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), 100);
+     private boolean checkPermissions()
+     {
 
-            while( !writeExternalStoragePermissionDialogAnswered )
-            {
-              try{ Thread.sleep(300); } catch (InterruptedException e) {}
-            }
+       try
+   		{
+   			if( android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M )
+   			{
+   				PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA);
+   				Log.v("SDL", "SD card permission a: " + getPackageName() + " perms " + info.requestedPermissions + " name " + info.packageName + " ver " + info.versionName);
+   				if( info.requestedPermissions != null && Arrays.asList(info.requestedPermissions).contains(Manifest.permission.WRITE_EXTERNAL_STORAGE) )
+   				{
+   					Log.v("SDL", "SD card permission b: REQUEST");
+   					int permissionCheck = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+   					if (permissionCheck != PackageManager.PERMISSION_GRANTED && !writeExternalStoragePermissionDialogAnswered)
+   					{
+   						requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+   					}
+   				}
+   			}
+   		}
+   		catch(Exception e) {}
 
-            return false;
-        }
         return true;
     }
 
@@ -209,7 +213,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
         Log.v(TAG, "Device: " + android.os.Build.DEVICE);
         Log.v(TAG, "Model: " + android.os.Build.MODEL);
         Log.v(TAG, "onCreate()");
@@ -286,6 +289,7 @@ public class MainActivity extends Activity {
             }
         }
 
+        Log.v(TAG, "checkPermissions()");
         checkPermissions();
 
     }
