@@ -13,7 +13,7 @@ freely, subject to the following restrictions:
 1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
    in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required. 
+   appreciated but is not required.
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
@@ -143,7 +143,7 @@ class DataDownloader extends Thread
 				setText( oldText.toString() );
 			}
 		}
-		
+
 		public void setText(final String str)
 		{
 			class Callback implements Runnable
@@ -164,7 +164,7 @@ class DataDownloader extends Thread
 					Parent.runOnUiThread(cb);
 			}
 		}
-		
+
 	}
 	public DataDownloader( MainActivity _Parent, TextView _Status )
 	{
@@ -175,7 +175,7 @@ class DataDownloader extends Thread
 		DownloadComplete = false;
 		this.start();
 	}
-	
+
 	public void setStatusField(TextView _Status)
 	{
 		synchronized(this) {
@@ -282,7 +282,7 @@ class DataDownloader extends Thread
 			}
 		}
 		checkFile = null;
-		
+
 		// Create output directory (not necessary for phone storage)
 		Log.i("SDL", "Downloading data to: '" + outFilesDir + "'");
 		try {
@@ -421,7 +421,7 @@ class DataDownloader extends Thread
 				break;
 			}
 		}
-		
+
 		if( FileInExpansion )
 		{
 			Log.i("SDL", "Count file size: '" + url);
@@ -630,7 +630,7 @@ class DataDownloader extends Thread
 				zip = new ZipInputStream(stream);
 
 			String extpath = getOutFilePath("");
-			
+
 			while(true)
 			{
 				ZipEntry entry = null;
@@ -670,7 +670,7 @@ class DataDownloader extends Thread
 					if( !(outDir.exists() && outDir.isDirectory()) )
 						outDir.mkdirs();
 				} catch( SecurityException e ) { };
-				
+
 				try {
 					CheckedInputStream check = new CheckedInputStream( new FileInputStream(path), new CRC32() );
 					while( check.read(buf, 0, buf.length) >= 0 ) {};
@@ -714,7 +714,7 @@ class DataDownloader extends Thread
 					updateStatusTime = System.currentTimeMillis();
 					Status.setText( downloadCount + "/" + downloadTotal + ": " + res.getString(R.string.dl_progress, percent, path.replace(extpath, "")) );
 				}
-				
+
 				try {
 					int len = zip.read(buf);
 					while (len >= 0)
@@ -740,7 +740,7 @@ class DataDownloader extends Thread
 					Log.i("SDL", "Saving file '" + path + "' - error writing or downloading: " + e.toString());
 					return false;
 				}
-				
+
 				try {
 					long count = 0, ret = 0;
 					CheckedInputStream check = new CheckedInputStream( new FileInputStream(path), new CRC32() );
@@ -752,7 +752,7 @@ class DataDownloader extends Thread
 					check.close();
 
 
-					// NOTE: For some reason this not work properly on older Android versions (4.4 and below). 
+					// NOTE: For some reason this not work properly on older Android versions (4.4 and below).
 					// Setting this to become a warning
 					if( check.getChecksum().getValue() != entry.getCrc() || count != entry.getSize() )
 					{
@@ -791,7 +791,7 @@ class DataDownloader extends Thread
 				Parent.runOnUiThread(cb);
 		}
 	}
-	
+
 	private String getOutFilePath(final String filename)
 	{
 		return outFilesDir + "/" + filename;
@@ -819,10 +819,10 @@ class DataDownloader extends Thread
 			AlertDialog.Builder builder = new AlertDialog.Builder(p);
 			builder.setTitle(p.getResources().getString(R.string.cancel_download));
 			builder.setMessage(p.getResources().getString(R.string.cancel_download) + (DownloadCanBeResumed ? " " + p.getResources().getString(R.string.cancel_download_resume) : ""));
-			
+
 			builder.setPositiveButton(p.getResources().getString(R.string.yes), new DialogInterface.OnClickListener()
 			{
-				public void onClick(DialogInterface dialog, int item) 
+				public void onClick(DialogInterface dialog, int item)
 				{
 					System.exit(1);
 					dialog.dismiss();
@@ -830,7 +830,7 @@ class DataDownloader extends Thread
 			});
 			builder.setNegativeButton(p.getResources().getString(R.string.no), new DialogInterface.OnClickListener()
 			{
-				public void onClick(DialogInterface dialog, int item) 
+				public void onClick(DialogInterface dialog, int item)
 				{
 					dialog.dismiss();
 				}
@@ -854,4 +854,3 @@ class DataDownloader extends Thread
 	private MainActivity Parent;
 	private String outFilesDir = null;
 }
-

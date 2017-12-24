@@ -13,7 +13,7 @@ freely, subject to the following restrictions:
 1. The origin of this software must not be misrepresented; you must not
    claim that you wrote the original software. If you use this software
    in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required. 
+   appreciated but is not required.
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
@@ -165,7 +165,7 @@ public class MainActivity extends Activity
 		}
 		img.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 		_layout.addView(img);
-		
+
 		_videoLayout = new FrameLayout(this);
 		_videoLayout.addView(_layout);
 
@@ -175,7 +175,7 @@ public class MainActivity extends Activity
 			_videoLayout.addView(_ad.getView());
 			_ad.getView().setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT));
 		}
-		
+
 		setContentView(_videoLayout);
 
 		class Callback implements Runnable
@@ -260,7 +260,7 @@ public class MainActivity extends Activity
 		}
 		catch(Exception e) {}
 	}
-	
+
 	public void setUpStatusLabel()
 	{
 		MainActivity Parent = this; // Too lazy to rename
@@ -358,7 +358,7 @@ public class MainActivity extends Activity
 		if(sdlInited)
 			return;
 		Log.i("SDL", "libSDL: Initializing video and SDL application");
-		
+
 		sdlInited = true;
 		DimSystemStatusBar.get().dim(_videoLayout);
 		_videoLayout.removeView(_layout);
@@ -547,7 +547,7 @@ public class MainActivity extends Activity
 		else
 			onResume();
 	}
-	
+
 	public boolean isPaused()
 	{
 		return _isPaused;
@@ -940,7 +940,7 @@ public class MainActivity extends Activity
 	{
 		return _screenKeyboard != null;
 	};
-	
+
 	public void setScreenKeyboardHintMessage(String s)
 	{
 		_screenKeyboardHintMessage = s;
@@ -964,7 +964,7 @@ public class MainActivity extends Activity
 
 	public void setAdvertisementPosition(int x, int y)
 	{
-		
+
 		if( _ad.getView() != null )
 		{
 			final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -1080,7 +1080,7 @@ public class MainActivity extends Activity
 			return _btn.onKeyDown(keyCode, event);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onKeyUp(int keyCode, final KeyEvent event)
 	{
@@ -1175,7 +1175,7 @@ public class MainActivity extends Activity
 			touchListener.onTouchEvent(ev);
 		return true;
 	}
-	
+
 	@Override
 	public boolean dispatchGenericMotionEvent (MotionEvent ev)
 	{
@@ -1246,7 +1246,7 @@ public class MainActivity extends Activity
 		super.onNewIntent(i);
 		setIntent(i);
 	}
-	
+
 	public void LoadLibraries()
 	{
 		try
@@ -1302,7 +1302,7 @@ public class MainActivity extends Activity
 		{
 			try {
 				Log.i("SDL", "libSDL: Extracting APP2SD-ed libs");
-				
+
 				InputStream in = null;
 				try
 				{
@@ -1326,7 +1326,7 @@ public class MainActivity extends Activity
 				try {
 					libDir.mkdirs();
 				} catch( SecurityException ee ) { };
-				
+
 				byte[] buf = new byte[16384];
 				while(true)
 				{
@@ -1395,7 +1395,7 @@ public class MainActivity extends Activity
 		{
 			try {
 				Log.i("SDL", "libSDL: Trying to extract binaries from assets " + binaryZip);
-				
+
 				InputStream in = null;
 				try
 				{
@@ -1427,7 +1427,7 @@ public class MainActivity extends Activity
 				try {
 					libDir.mkdirs();
 				} catch( SecurityException ee ) { };
-				
+
 				byte[] buf = new byte[16384];
 				while(true)
 				{
@@ -1600,6 +1600,8 @@ public class MainActivity extends Activity
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
 	{
+    Log.i("SDL", "libSDL: Permission request ");
+
 		if (permissions.length == 0 || grantResults.length == 0)
 		{
 			Log.i("SDL", "libSDL: Permission request dialog was aborted");
